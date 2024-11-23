@@ -18,6 +18,7 @@ import com.faridnia.khoroojyar.ui.theme.KhoroojYarTheme
 @Composable
 fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
     val enterTimeInput = viewModel.enterTimeInput.value
+    val exitTimeInput = viewModel.exitTimeInput.value
     val exitTime = viewModel.exitTime.value
     val vacationMessage = viewModel.vacationMessage.value
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -41,11 +42,23 @@ fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             modifier = Modifier.fillMaxWidth()
         )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = stringResource(R.string.enter_your_exit_time_optional),
+            style = MaterialTheme.typography.titleMedium
+        )
+        OutlinedTextField(
+            value = exitTimeInput,
+            onValueChange = { viewModel.onExitTimeChange(it) },
+            placeholder = { Text(stringResource(R.string.e_g_17_45)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            modifier = Modifier.fillMaxWidth()
+        )
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
                 keyboardController?.hide() // Close the keyboard
-                viewModel.calculateExitTime()
+                viewModel.calculateTime()
             },
             modifier = Modifier.fillMaxWidth()
         ) {

@@ -1,4 +1,6 @@
 <resources>
+    <string name="enter_your_exit_time_optional">Enter Your Exit Time (Optional)</string>
+    <string name="e_g_17_45">e.g., 17:45</string>
     <string name="app_name">KhoroojYar</string>
     <string name="enter_your_entry_time_hh_mm">Enter Your Entry Time (HH:mm)</string>
     <string name="e_g_09_15">e.g., 09:15</string>
