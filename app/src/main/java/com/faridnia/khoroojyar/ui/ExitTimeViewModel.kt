@@ -47,12 +47,14 @@ class ExitTimeViewModel : ViewModel() {
         _state.update { currentState ->
             currentState.copy(enterTimeInput = newTime)
         }
+        calculateTime()
     }
 
     fun onExitTimeChange(newTime: String) {
         _state.update { currentState ->
             currentState.copy(exitTimeInput = newTime)
         }
+        calculateTime()
     }
 
     fun calculateTime() {
@@ -74,7 +76,7 @@ class ExitTimeViewModel : ViewModel() {
                 if (enterTime.isAfter(LocalTime.of(9, 0))) {
                     _state.update { currentState ->
                         currentState.copy(
-                            vacationMessage = "Vacation needed: ${latestStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}",
+                            vacationMessage = "Time Off needed: ${latestStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}",
                             exitTime = "17:45"
                         )
                     }
@@ -159,6 +161,15 @@ class ExitTimeViewModel : ViewModel() {
                 )
             )
         }
+    }
+
+    fun clearEntries() {
+        _state.value = _state.value.copy(
+            enterTimeInput = "",
+            exitTimeInput = "",
+            exitTime = "",
+            vacationMessage = ""
+        )
     }
 
 

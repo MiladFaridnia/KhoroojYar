@@ -1,4 +1,3 @@
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -69,7 +69,7 @@ fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
             closeDialog(false)
         }
 
-    // Box for stacking the FAB on top of the content
+    // Box for stacking content and buttons
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -107,7 +107,8 @@ fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
             state.exitTime.takeIf { it.isNotEmpty() }?.let {
                 Text(
                     text = stringResource(R.string.exit_time, state.exitTime),
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Color(0xFF35BD69)
                 )
             }
 
@@ -127,7 +128,16 @@ fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
         ) {
-            Icon(imageVector = Icons.Default.Info, contentDescription = "Info")
+            Icon(imageVector = Icons.Default.Info, contentDescription = stringResource(R.string.clear))
+        }
+
+        Button(
+            onClick = { viewModel.clearEntries() },
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(16.dp)
+        ) {
+            Text(text = stringResource(R.string.clear))
         }
     }
 

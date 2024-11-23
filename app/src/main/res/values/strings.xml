@@ -12,4 +12,5 @@
     <string name="calculate_remained_days_off">Calculate Remained Days Off</string>
     <string name="enter_total_hours">Enter total hours</string>
     <string name="e_g_35">e.g., 35</string>
+    <string name="clear">Clear</string>
 </resources>
