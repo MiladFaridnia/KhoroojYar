@@ -6,7 +6,7 @@ plugins {
 
 android {
     val versionMajor = 1
-    val versionMinor = 0
+    val versionMinor = 1
     val versionPatch = 0
     val appName = "KhoroojYar"
     val appVersionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
