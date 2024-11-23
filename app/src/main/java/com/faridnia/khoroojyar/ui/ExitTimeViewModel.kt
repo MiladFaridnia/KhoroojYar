@@ -1,7 +1,13 @@
 package com.faridnia.khoroojyar.ui
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.faridnia.khoroojyar.ui.component.snackbar.SnackbarController
+import com.faridnia.khoroojyar.ui.component.snackbar.SnackbarEvent
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -9,14 +15,8 @@ import java.time.format.DateTimeParseException
 
 class ExitTimeViewModel : ViewModel() {
 
-    var enterTimeInput = mutableStateOf("")
-        private set
-    var exitTimeInput = mutableStateOf("")
-        private set
-    var exitTime = mutableStateOf("")
-        private set
-    var vacationMessage = mutableStateOf("")
-        private set
+    private val _state = MutableStateFlow(ExitTimeState())
+    val state = _state.asStateFlow()
 
     private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
     private val workDuration = Duration.ofMinutes(525) // 8 hours and 45 minutes
@@ -25,41 +25,63 @@ class ExitTimeViewModel : ViewModel() {
     private val latestEnd = LocalTime.of(17, 45)
 
     fun onEnterTimeChange(newTime: String) {
-        enterTimeInput.value = newTime
+        _state.update { currentState ->
+            currentState.copy(enterTimeInput = newTime)
+        }
     }
 
     fun onExitTimeChange(newTime: String) {
-        exitTimeInput.value = newTime
+        _state.update { currentState ->
+            currentState.copy(exitTimeInput = newTime)
+        }
     }
 
     fun calculateTime() {
         try {
-            val enterTime = LocalTime.parse(enterTimeInput.value, timeFormatter)
+            val enterTime = LocalTime.parse(_state.value.enterTimeInput, timeFormatter)
 
-            if (exitTimeInput.value.isNotEmpty()) {
-                // Exit time provided, calculate vacation
-                val exitTimeProvided = LocalTime.parse(exitTimeInput.value, timeFormatter)
+            if (_state.value.exitTimeInput.isNotEmpty()) {
+                val exitTimeProvided = LocalTime.parse(_state.value.exitTimeInput, timeFormatter)
+
+                if (exitTimeProvided.isBefore(enterTime)) {
+                    showSnackbar("Exit time cannot be before enter time")
+                }
+
                 calculateVacation(enterTime, exitTimeProvided)
-                exitTime.value = ""
+                _state.update { currentState ->
+                    currentState.copy(exitTime = "")
+                }
             } else {
-                // Default exit time
                 if (enterTime.isAfter(LocalTime.of(9, 0))) {
-                    vacationMessage.value =
-                        "Vacation needed: ${latestStart.format(timeFormatter)} to ${
-                            enterTime.format(
-                                timeFormatter
-                            )
-                        }"
-                    exitTime.value = "17:45"
+                    _state.update { currentState ->
+                        currentState.copy(
+                            vacationMessage = "Vacation needed: ${latestStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}",
+                            exitTime = "17:45"
+                        )
+                    }
                 } else {
-                    vacationMessage.value = ""
+                    _state.update { currentState ->
+                        currentState.copy(vacationMessage = "")
+                    }
                     val exitTimeCalculated = enterTime.plusHours(8).plusMinutes(45)
-                    exitTime.value = exitTimeCalculated.format(timeFormatter)
+                    _state.update { currentState ->
+                        currentState.copy(exitTime = exitTimeCalculated.format(timeFormatter))
+                    }
                 }
             }
         } catch (e: DateTimeParseException) {
-            exitTime.value = "Invalid time format"
-            vacationMessage.value = ""
+            _state.update { currentState ->
+                currentState.copy(
+                    exitTime = "Invalid time format",
+                    vacationMessage = ""
+                )
+            }
+            showSnackbar("Invalid time format")
+        } catch (e: IllegalArgumentException) {
+            // Handle exit time before enter time error
+            _state.update { currentState ->
+                currentState.copy(exitTime = "Invalid exit time")
+            }
         }
     }
 
@@ -68,12 +90,11 @@ class ExitTimeViewModel : ViewModel() {
 
         if (exitTime == latestEnd && enterTime.isAfter(LocalTime.of(9, 0))) {
             val lateEntryVacationStart = LocalTime.of(9, 0)
-            vacationMessage.value =
-                "Vacation needed: ${lateEntryVacationStart.format(timeFormatter)} to ${
-                    enterTime.format(
-                        timeFormatter
-                    )
-                }"
+            _state.update { currentState ->
+                currentState.copy(
+                    vacationMessage = "Vacation needed: ${lateEntryVacationStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}"
+                )
+            }
             return
         }
 
@@ -83,42 +104,41 @@ class ExitTimeViewModel : ViewModel() {
 
             if (exitTime == latestEnd) {
                 val vacationStart = LocalTime.of(9, 0)
-                vacationParts.add(
-                    "${vacationStart.format(timeFormatter)} to ${
-                        enterTime.format(
-                            timeFormatter
-                        )
-                    }"
-                )
+                vacationParts.add("${vacationStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}")
             } else {
                 if (exitTime.isBefore(latestEnd)) {
                     val endVacationEnd = minOf(exitTime.plus(missingDuration), latestEnd)
-                    vacationParts.add(
-                        "${exitTime.format(timeFormatter)} to ${
-                            endVacationEnd.format(
-                                timeFormatter
-                            )
-                        }"
-                    )
+                    vacationParts.add("${exitTime.format(timeFormatter)} to ${endVacationEnd.format(timeFormatter)}")
                 }
                 val remainingMissing = missingDuration.minus(
-                    Duration.between(exitTime, minOf(exitTime.plus(missingDuration), latestEnd))
+                    Duration.between(
+                        exitTime,
+                        minOf(exitTime.plus(missingDuration), latestEnd)
+                    )
                 )
                 if (!remainingMissing.isZero && enterTime.isAfter(earliestStart)) {
                     val startVacationStart = maxOf(earliestStart, enterTime.minus(remainingMissing))
-                    vacationParts.add(
-                        "${startVacationStart.format(timeFormatter)} to ${
-                            enterTime.format(
-                                timeFormatter
-                            )
-                        }"
-                    )
+                    vacationParts.add("${startVacationStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}")
                 }
             }
 
-            vacationMessage.value = "Vacation needed: ${vacationParts.joinToString(", ")}"
+            _state.update { currentState ->
+                currentState.copy(vacationMessage = "Vacation needed: ${vacationParts.joinToString(", ")}")
+            }
         } else {
-            vacationMessage.value = ""
+            _state.update { currentState ->
+                currentState.copy(vacationMessage = "")
+            }
+        }
+    }
+
+    private fun showSnackbar(message: String) {
+        viewModelScope.launch {
+            SnackbarController.sendEvent(
+                event = SnackbarEvent(
+                    message = message
+                )
+            )
         }
     }
 }
