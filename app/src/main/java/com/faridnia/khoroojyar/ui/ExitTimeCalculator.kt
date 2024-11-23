@@ -30,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -95,16 +97,6 @@ fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = {
-                    keyboardController?.hide()
-                    viewModel.calculateTime()
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(R.string.calculate_exit_time))
-            }
-
             Spacer(modifier = Modifier.height(36.dp))
 
             state.exitTime.takeIf { it.isNotEmpty() }?.let {
@@ -162,7 +154,10 @@ fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
                 .align(Alignment.BottomStart)
                 .padding(16.dp)
         ) {
-            Text(text = stringResource(R.string.clear))
+            Text(
+                text = stringResource(R.string.clear),
+                fontFamily = FontFamily(Font(R.font.iran_sans_mobile_fa_num)),
+            )
         }
     }
 

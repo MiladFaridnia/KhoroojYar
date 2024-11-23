@@ -6,11 +6,12 @@
     <string name="e_g_09_15">مثلاً 09:15</string>
     <string name="calculate_exit_time">محاسبه زمان خروج</string>
     <string name="exit_time">زمان خروج: %1$s</string>
-    <string name="you_have_days_off_remaining">شما %1$s روز مرخصی باقی مانده دارید.</string>
+    <string name="you_have_days_off_remaining">شما %1$s مرخصی باقی مانده دارید.</string>
     <string name="close">بستن</string>
     <string name="info">اطلاعات</string>
     <string name="calculate_remained_days_off">محاسبه روزهای مرخصی باقی‌مانده</string>
     <string name="enter_total_hours">مجموع ساعات را وارد کنید</string>
     <string name="e_g_35">مثلاً 35</string>
     <string name="clear">پاک کردن</string>
+    <string name="confirm">تایید</string>
 </resources>

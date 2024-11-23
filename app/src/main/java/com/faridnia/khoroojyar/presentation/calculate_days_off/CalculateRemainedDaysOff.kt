@@ -14,6 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,14 +40,25 @@ fun CalculateRemainedDaysOff(
     ) {
         Text(
             text = stringResource(R.string.calculate_remained_days_off),
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
+            fontFamily = FontFamily(Font(R.font.iran_sans_mobile_fa_num))
         )
 
         OutlinedTextField(
             value = hoursInput,
             onValueChange = { viewModel.onHoursInputChange(it) },
-            label = { Text(stringResource(R.string.enter_total_hours)) },
-            placeholder = { Text(stringResource(R.string.e_g_35)) },
+            label = {
+                Text(
+                    text = stringResource(id = R.string.enter_total_hours),
+                    fontFamily = FontFamily(Font(R.font.iran_sans_mobile_fa_num)),
+                )
+            },
+            placeholder = {
+                Text(
+                    text = stringResource(id = R.string.e_g_35),
+                    fontFamily = FontFamily(Font(R.font.iran_sans_mobile_fa_num)),
+                )
+            },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )
@@ -60,7 +73,8 @@ fun CalculateRemainedDaysOff(
                     text = stringResource(R.string.you_have_days_off_remaining, calculatedDaysOff),
                     style = MaterialTheme.typography.titleMedium,
                     color = Color(0xFF35BD69),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    fontFamily = FontFamily(Font(R.font.iran_sans_mobile_fa_num))
                 )
             }
         }
