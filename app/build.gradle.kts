@@ -5,28 +5,48 @@ plugins {
 }
 
 android {
-    namespace = "com.faridnia.khoroojyar"
-    compileSdk = 35
+    val versionMajor = 1
+    val versionMinor = 0
+    val versionPatch = 0
+    val appName = "KhoroojYar"
+    val appVersionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
+    val appVersionName = "$versionMajor.$versionMinor.$versionPatch"
 
     defaultConfig {
         applicationId = "com.faridnia.khoroojyar"
         minSdk = 33
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        targetSdk = 35
+        compileSdk = 35
+        namespace = "com.faridnia.khoroojyar"
+        versionCode = appVersionCode
+        versionName = appVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
-        release {
-            isMinifyEnabled = false
+        getByName("release") {
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
     }
+
+    buildFeatures {
+        compose = true
+    }
+
+    applicationVariants.all {
+        outputs.all {
+            val outputImpl = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+//                val buildType = variant.buildType.name
+            val buildType = name.split("-")[0]
+            outputImpl.outputFileName = "${appName}-${buildType}-v${appVersionName}-c${appVersionCode}.apk"
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
