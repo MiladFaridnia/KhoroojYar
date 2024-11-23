@@ -19,6 +19,7 @@ import com.faridnia.khoroojyar.ui.theme.KhoroojYarTheme
 fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
     val enterTimeInput = viewModel.enterTimeInput.value
     val exitTime = viewModel.exitTime.value
+    val vacationMessage = viewModel.vacationMessage.value
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Column(
@@ -55,6 +56,14 @@ fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
             Text(
                 text = stringResource(R.string.exit_time, exitTime),
                 style = MaterialTheme.typography.titleLarge
+            )
+        }
+        if (vacationMessage.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = vacationMessage,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.error
             )
         }
     }
