@@ -76,7 +76,7 @@ class ExitTimeViewModel : ViewModel() {
                 if (enterTime.isAfter(LocalTime.of(9, 0))) {
                     _state.update { currentState ->
                         currentState.copy(
-                            vacationMessage = "Time Off needed: ${latestStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}",
+                            vacationMessage = "Time Off needed:\n -> ${latestStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}",
                             exitTime = "17:45"
                         )
                     }
@@ -113,7 +113,7 @@ class ExitTimeViewModel : ViewModel() {
             val lateEntryVacationStart = LocalTime.of(9, 0)
             _state.update { currentState ->
                 currentState.copy(
-                    vacationMessage = "Vacation needed: ${lateEntryVacationStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}"
+                    vacationMessage = "Time off needed:\n ->${lateEntryVacationStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}"
                 )
             }
             return
@@ -139,12 +139,12 @@ class ExitTimeViewModel : ViewModel() {
                 )
                 if (!remainingMissing.isZero && enterTime.isAfter(earliestStart)) {
                     val startVacationStart = maxOf(earliestStart, enterTime.minus(remainingMissing))
-                    vacationParts.add("${startVacationStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}")
+                    vacationParts.add("-> ${startVacationStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}")
                 }
             }
 
             _state.update { currentState ->
-                currentState.copy(vacationMessage = "Vacation needed: ${vacationParts.joinToString(", ")}")
+                currentState.copy(vacationMessage = "Time off needed:\n -> ${vacationParts.joinToString("\n ")}")
             }
         } else {
             _state.update { currentState ->

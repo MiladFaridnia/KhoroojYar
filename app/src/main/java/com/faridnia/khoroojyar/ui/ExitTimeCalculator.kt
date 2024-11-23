@@ -1,3 +1,4 @@
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -6,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
@@ -28,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -102,22 +105,41 @@ fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
                 Text(stringResource(R.string.calculate_exit_time))
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(36.dp))
 
             state.exitTime.takeIf { it.isNotEmpty() }?.let {
                 Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = Color(0xFF35BD69),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(8.dp),
                     text = stringResource(R.string.exit_time, state.exitTime),
                     style = MaterialTheme.typography.titleLarge,
-                    color = Color(0xFF35BD69)
+                    color = Color(0xFF35BD69),
+                    textAlign = TextAlign.Center
+
                 )
             }
 
             state.vacationMessage.takeIf { it.isNotEmpty() }?.let {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.error,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(8.dp),
                     text = it,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.error
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center
                 )
             }
         }
@@ -128,7 +150,10 @@ fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
         ) {
-            Icon(imageVector = Icons.Default.Info, contentDescription = stringResource(R.string.clear))
+            Icon(
+                imageVector = Icons.Default.Info,
+                contentDescription = stringResource(R.string.clear)
+            )
         }
 
         Button(
