@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">KhoroojYar</string>
+    <string name="enter_your_entry_time_hh_mm">Enter Your Entry Time (HH:mm)</string>
+    <string name="e_g_09_15">e.g., 09:15</string>
+    <string name="calculate_exit_time">Calculate Exit Time</string>
+    <string name="exit_time">Exit Time: %1$s</string>
 </resources>
