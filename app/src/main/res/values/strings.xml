@@ -6,4 +6,7 @@
     <string name="e_g_09_15">e.g., 09:15</string>
     <string name="calculate_exit_time">Calculate Exit Time</string>
     <string name="exit_time">Exit Time: %1$s</string>
+    <string name="you_have_days_off_remaining">You have %1$s days off remaining.</string>
+    <string name="close">Close</string>
+    <string name="info">Info</string>
 </resources>

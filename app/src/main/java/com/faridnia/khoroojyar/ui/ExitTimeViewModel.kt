@@ -4,8 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.faridnia.khoroojyar.ui.component.snackbar.SnackbarController
 import com.faridnia.khoroojyar.ui.component.snackbar.SnackbarEvent
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Duration
@@ -23,6 +26,22 @@ class ExitTimeViewModel : ViewModel() {
     private val earliestStart = LocalTime.of(8, 0)
     private val latestStart = LocalTime.of(9, 0)
     private val latestEnd = LocalTime.of(17, 45)
+
+    // UI Event channel for controlling bottom sheet
+    private val _uiEventChannel = Channel<UiEvent>(Channel.BUFFERED)
+    val uiEvents: Flow<UiEvent> = _uiEventChannel.receiveAsFlow()
+
+    fun onFabClicked() {
+        sendUiEvent(UiEvent.ShowBottomSheet)
+    }
+
+    fun closeBottomSheet() {
+        sendUiEvent(UiEvent.HideBottomSheet)
+    }
+
+    private fun sendUiEvent(event: UiEvent) {
+        _uiEventChannel.trySend(event)
+    }
 
     fun onEnterTimeChange(newTime: String) {
         _state.update { currentState ->
@@ -140,5 +159,11 @@ class ExitTimeViewModel : ViewModel() {
                 )
             )
         }
+    }
+
+
+    sealed class UiEvent {
+        data object ShowBottomSheet : UiEvent()
+        data object HideBottomSheet : UiEvent()
     }
 }

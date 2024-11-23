@@ -1,19 +1,25 @@
-package com.faridnia.khoroojyar.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimePickerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +33,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.faridnia.khoroojyar.R
+import com.faridnia.khoroojyar.presentation.calculate_days_off.CalculateRemainedDaysOff
+import com.faridnia.khoroojyar.ui.ExitTimeViewModel
+import com.faridnia.khoroojyar.ui.component.TimePickerButton
 import com.faridnia.khoroojyar.ui.component.TimePickerDialog
 import com.faridnia.khoroojyar.ui.theme.KhoroojYarTheme
 import java.util.Locale
@@ -39,6 +48,18 @@ fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
 
     var showEnterTimePickerDialog by remember { mutableStateOf(false) }
     var showExitTimePickerDialog by remember { mutableStateOf(false) }
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var isBottomSheetVisible by remember { mutableStateOf(false) }
+
+    // Collect UI events for the bottom sheet
+    LaunchedEffect(viewModel.uiEvents) {
+        viewModel.uiEvents.collect { event ->
+            when (event) {
+                ExitTimeViewModel.UiEvent.ShowBottomSheet -> isBottomSheetVisible = true
+                ExitTimeViewModel.UiEvent.HideBottomSheet -> isBottomSheetVisible = false
+            }
+        }
+    }
 
     val onTimeConfirm: (TimePickerState, (String) -> Unit, (Boolean) -> Unit) -> Unit =
         { timePickerState, onTimeChange, closeDialog ->
@@ -48,53 +69,65 @@ fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
             closeDialog(false)
         }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        TimePickerButton(
-            label = state.enterTimeInput.ifEmpty { stringResource(R.string.enter_your_entry_time_hh_mm) },
-            onClick = { showEnterTimePickerDialog = true }
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        TimePickerButton(
-            label = state.exitTimeInput.ifEmpty { stringResource(R.string.enter_your_exit_time_optional) },
-            onClick = { showExitTimePickerDialog = true }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                keyboardController?.hide()
-                viewModel.calculateTime()
-            },
-            modifier = Modifier.fillMaxWidth()
+    // Box for stacking the FAB on top of the content
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(stringResource(R.string.calculate_exit_time))
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        state.exitTime.takeIf { it.isNotEmpty() }?.let {
-            Text(
-                text = stringResource(R.string.exit_time, state.exitTime),
-                style = MaterialTheme.typography.titleLarge
+            TimePickerButton(
+                label = state.enterTimeInput.ifEmpty { stringResource(R.string.enter_your_entry_time_hh_mm) },
+                onClick = { showEnterTimePickerDialog = true }
             )
-        }
 
-        state.vacationMessage.takeIf { it.isNotEmpty() }?.let {
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = it,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.error
+
+            TimePickerButton(
+                label = state.exitTimeInput.ifEmpty { stringResource(R.string.enter_your_exit_time_optional) },
+                onClick = { showExitTimePickerDialog = true }
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = {
+                    keyboardController?.hide()
+                    viewModel.calculateTime()
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.calculate_exit_time))
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            state.exitTime.takeIf { it.isNotEmpty() }?.let {
+                Text(
+                    text = stringResource(R.string.exit_time, state.exitTime),
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
+
+            state.vacationMessage.takeIf { it.isNotEmpty() }?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+
+        FloatingActionButton(
+            onClick = { viewModel.onFabClicked() },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Icon(imageVector = Icons.Default.Info, contentDescription = "Info")
         }
     }
 
@@ -121,15 +154,14 @@ fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
             onDismiss = { showExitTimePickerDialog = false }
         )
     }
-}
 
-@Composable
-fun TimePickerButton(label: String, onClick: () -> Unit) {
-    OutlinedButton(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(text = label)
+    if (isBottomSheetVisible) {
+        ModalBottomSheet(
+            onDismissRequest = { viewModel.closeBottomSheet() },
+            sheetState = bottomSheetState
+        ) {
+            CalculateRemainedDaysOff(onDismiss = { viewModel.closeBottomSheet() })
+        }
     }
 }
 
