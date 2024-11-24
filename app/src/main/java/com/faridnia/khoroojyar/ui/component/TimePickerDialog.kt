@@ -17,8 +17,12 @@ import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.faridnia.khoroojyar.R
 import com.faridnia.khoroojyar.ui.theme.KhoroojYarTheme
 import java.util.Calendar
 
@@ -59,7 +63,10 @@ fun TimePickerDialog(
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { onConfirm(timePickerState) }) {
-                    Text("Confirm")
+                    Text(
+                        text = stringResource(R.string.confirm),
+                        fontFamily = FontFamily(Font(R.font.iran_sans_mobile_fa_num)),
+                    )
                 }
             }
         }
