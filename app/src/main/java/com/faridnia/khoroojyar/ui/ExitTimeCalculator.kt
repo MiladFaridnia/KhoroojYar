@@ -28,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -49,14 +48,12 @@ import java.util.Locale
 @Composable
 fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     var showEnterTimePickerDialog by remember { mutableStateOf(false) }
     var showExitTimePickerDialog by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isBottomSheetVisible by remember { mutableStateOf(false) }
 
-    // Collect UI events for the bottom sheet
     LaunchedEffect(viewModel.uiEvents) {
         viewModel.uiEvents.collect { event ->
             when (event) {
@@ -74,7 +71,6 @@ fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
             closeDialog(false)
         }
 
-    // Box for stacking content and buttons
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -97,9 +93,26 @@ fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(36.dp))
+            state.totalTimeSpent.takeIf { it.isNotEmpty() }?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = Color(0xFF35BD69),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(8.dp),
+                    text = it,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color(0xFF35BD69),
+                    textAlign = TextAlign.Center
+                )
+            }
 
             state.exitTime.takeIf { it.isNotEmpty() }?.let {
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -113,7 +126,6 @@ fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
                     style = MaterialTheme.typography.titleLarge,
                     color = Color(0xFF35BD69),
                     textAlign = TextAlign.Center
-
                 )
             }
 

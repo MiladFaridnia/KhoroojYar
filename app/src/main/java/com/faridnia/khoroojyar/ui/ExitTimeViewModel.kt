@@ -15,6 +15,7 @@ import java.time.Duration
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import java.util.Locale
 
 class ExitTimeViewModel : ViewModel() {
 
@@ -57,52 +58,105 @@ class ExitTimeViewModel : ViewModel() {
         calculateTime()
     }
 
-    fun calculateTime() {
+    private fun calculateTime() {
         try {
             val enterTime = LocalTime.parse(_state.value.enterTimeInput, timeFormatter)
-
             if (_state.value.exitTimeInput.isNotEmpty()) {
-                val exitTimeProvided = LocalTime.parse(_state.value.exitTimeInput, timeFormatter)
-
-                if (exitTimeProvided.isBefore(enterTime)) {
-                    showSnackbar("Exit time cannot be before enter time")
-                }
-
-                calculateVacation(enterTime, exitTimeProvided)
-                _state.update { currentState ->
-                    currentState.copy(exitTime = "")
-                }
+                handleExitTimeProvided(enterTime)
             } else {
-                if (enterTime.isAfter(LocalTime.of(9, 0))) {
-                    _state.update { currentState ->
-                        currentState.copy(
-                            vacationMessage = "Time Off needed:\n -> ${latestStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}",
-                            exitTime = "17:45"
-                        )
-                    }
-                } else {
-                    _state.update { currentState ->
-                        currentState.copy(vacationMessage = "")
-                    }
-                    val exitTimeCalculated = enterTime.plusHours(8).plusMinutes(45)
-                    _state.update { currentState ->
-                        currentState.copy(exitTime = exitTimeCalculated.format(timeFormatter))
-                    }
-                }
+                handleNoExitTime(enterTime)
             }
         } catch (e: DateTimeParseException) {
-            _state.update { currentState ->
-                currentState.copy(
-                    exitTime = "Invalid time format",
-                    vacationMessage = ""
-                )
-            }
-            showSnackbar("Invalid time format")
+            handleInvalidTimeFormat()
         } catch (e: IllegalArgumentException) {
-            // Handle exit time before enter time error
-            _state.update { currentState ->
-                currentState.copy(exitTime = "Invalid exit time")
-            }
+            handleInvalidExitTime()
+        }
+    }
+
+    private fun handleExitTimeProvided(enterTime: LocalTime) {
+        val exitTimeProvided = LocalTime.parse(_state.value.exitTimeInput, timeFormatter)
+
+        if (exitTimeProvided.isBefore(enterTime)) {
+            showSnackbar("Exit time cannot be before enter time")
+        } else {
+            calculateVacation(enterTime, exitTimeProvided)
+            updateTotalTimeSpent(enterTime, exitTimeProvided)
+        }
+    }
+
+    private fun handleNoExitTime(enterTime: LocalTime) {
+        if (enterTime.isAfter(LocalTime.of(9, 0))) {
+            updateLateStartState(enterTime)
+        } else {
+            _state.update { it.copy(vacationMessage = "") }
+            calculateAndUpdateDefaultExitTime(enterTime)
+        }
+    }
+
+    private fun updateTotalTimeSpent(enterTime: LocalTime, exitTime: LocalTime) {
+        val totalTimeWorked = Duration.between(enterTime, exitTime)
+        val hoursWorked = totalTimeWorked.toHours()
+        val minutesWorked = totalTimeWorked.toMinutes() % 60
+
+        _state.update { currentState ->
+            currentState.copy(
+                exitTime = "",
+                totalTimeSpent = String.format(
+                    Locale.US,
+                    "Time worked:\n %02d hours and %02d minutes",
+                    hoursWorked,
+                    minutesWorked
+                )
+            )
+        }
+    }
+
+    private fun updateLateStartState(enterTime: LocalTime) {
+        _state.update { currentState ->
+            currentState.copy(
+                vacationMessage = "Time Off:\n -> ${latestStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}",
+                exitTime = "17:45",
+                totalTimeSpent = ""
+            )
+        }
+    }
+
+    private fun calculateAndUpdateDefaultExitTime(enterTime: LocalTime) {
+        val exitTimeCalculated = enterTime.plusHours(8).plusMinutes(45)
+        val totalTimeWorked = Duration.between(enterTime, exitTimeCalculated)
+        val hoursWorked = totalTimeWorked.toHours()
+        val minutesWorked = totalTimeWorked.toMinutes() % 60
+
+        _state.update { currentState ->
+            currentState.copy(
+                exitTime = exitTimeCalculated.format(timeFormatter),
+                totalTimeSpent = String.format(
+                    Locale.US,
+                    "Time worked:\n %02d hours and %02d minutes",
+                    hoursWorked,
+                    minutesWorked
+                )
+            )
+        }
+    }
+
+    private fun handleInvalidTimeFormat() {
+        _state.update { currentState ->
+            currentState.copy(
+                exitTime = "Invalid time format",
+                vacationMessage = "",
+                totalTimeSpent = ""
+            )
+        }
+        showSnackbar("Invalid time format")
+    }
+
+    private fun handleInvalidExitTime() {
+        _state.update { currentState ->
+            currentState.copy(
+                exitTime = "Invalid exit time",
+                totalTimeSpent = ""
+            )
         }
     }
 
@@ -113,7 +167,7 @@ class ExitTimeViewModel : ViewModel() {
             val lateEntryVacationStart = LocalTime.of(9, 0)
             _state.update { currentState ->
                 currentState.copy(
-                    vacationMessage = "Time off needed:\n ->${lateEntryVacationStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}"
+                    vacationMessage = "Time off:\n ->${lateEntryVacationStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}"
                 )
             }
             return
@@ -144,7 +198,7 @@ class ExitTimeViewModel : ViewModel() {
             }
 
             _state.update { currentState ->
-                currentState.copy(vacationMessage = "Time off needed:\n -> ${vacationParts.joinToString("\n ")}")
+                currentState.copy(vacationMessage = "Time off:\n -> ${vacationParts.joinToString("\n ")}")
             }
         } else {
             _state.update { currentState ->
