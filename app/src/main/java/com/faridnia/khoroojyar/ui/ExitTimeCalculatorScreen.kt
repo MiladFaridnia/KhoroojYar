@@ -46,7 +46,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
+fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     var showEnterTimePickerDialog by remember { mutableStateOf(false) }
@@ -212,6 +212,6 @@ fun ExitTimeCalculator(viewModel: ExitTimeViewModel = viewModel()) {
 @Composable
 fun PreviewExitTimeCalc(modifier: Modifier = Modifier) {
     KhoroojYarTheme {
-        ExitTimeCalculator()
+        ExitTimeCalculatorScreen()
     }
 }

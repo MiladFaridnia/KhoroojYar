@@ -28,7 +28,6 @@ class ExitTimeViewModel : ViewModel() {
     private val latestStart = LocalTime.of(9, 0)
     private val latestEnd = LocalTime.of(17, 45)
 
-    // UI Event channel for controlling bottom sheet
     private val _uiEventChannel = Channel<UiEvent>(Channel.BUFFERED)
     val uiEvents: Flow<UiEvent> = _uiEventChannel.receiveAsFlow()
 
@@ -79,8 +78,29 @@ class ExitTimeViewModel : ViewModel() {
         if (exitTimeProvided.isBefore(enterTime)) {
             showSnackbar("Exit time cannot be before enter time")
         } else {
+            val lateEntryTimeOff = calculateLateEntryTimeOff(enterTime)
+            val overtime = calculateOvertime(exitTimeProvided)
+
             calculateVacation(enterTime, exitTimeProvided)
-            updateTotalTimeSpent(enterTime, exitTimeProvided)
+            updateTotalTimeSpent(enterTime, exitTimeProvided, lateEntryTimeOff, overtime)
+        }
+    }
+
+    private fun calculateLateEntryTimeOff(enterTime: LocalTime): Duration {
+        val standardStartTime = LocalTime.of(9, 0)
+        return if (enterTime.isAfter(standardStartTime)) {
+            Duration.between(standardStartTime, enterTime)
+        } else {
+            Duration.ZERO
+        }
+    }
+
+    private fun calculateOvertime(exitTime: LocalTime): Duration {
+        val standardEndTime = LocalTime.of(17, 45)
+        return if (exitTime.isAfter(standardEndTime)) {
+            Duration.between(standardEndTime, exitTime)
+        } else {
+            Duration.ZERO
         }
     }
 
@@ -93,20 +113,55 @@ class ExitTimeViewModel : ViewModel() {
         }
     }
 
-    private fun updateTotalTimeSpent(enterTime: LocalTime, exitTime: LocalTime) {
+    private fun updateTotalTimeSpent(
+        enterTime: LocalTime,
+        exitTime: LocalTime,
+        lateEntryTimeOff: Duration,
+        overtime: Duration
+    ) {
         val totalTimeWorked = Duration.between(enterTime, exitTime)
         val hoursWorked = totalTimeWorked.toHours()
         val minutesWorked = totalTimeWorked.toMinutes() % 60
 
+        val lateHours = lateEntryTimeOff.toHours()
+        val lateMinutes = lateEntryTimeOff.toMinutes() % 60
+
+        val overtimeHours = overtime.toHours()
+        val overtimeMinutes = overtime.toMinutes() % 60
+
         _state.update { currentState ->
             currentState.copy(
                 exitTime = "",
-                totalTimeSpent = String.format(
-                    Locale.US,
-                    "Time worked:\n %02d hours and %02d minutes",
-                    hoursWorked,
-                    minutesWorked
-                )
+                totalTimeSpent = buildString {
+                    append(
+                        String.format(
+                            Locale.US,
+                            "Time worked:\n %02d hours and %02d minutes",
+                            hoursWorked,
+                            minutesWorked
+                        )
+                    )
+                    if (!lateEntryTimeOff.isZero) {
+                        append(
+                            String.format(
+                                Locale.US,
+                                "\nTime off:\n %02d hours and %02d minutes",
+                                lateHours,
+                                lateMinutes
+                            )
+                        )
+                    }
+                    if (!overtime.isZero) {
+                        append(
+                            String.format(
+                                Locale.US,
+                                "\nOvertime:\n %02d hours and %02d minutes",
+                                overtimeHours,
+                                overtimeMinutes
+                            )
+                        )
+                    }
+                }
             )
         }
     }
