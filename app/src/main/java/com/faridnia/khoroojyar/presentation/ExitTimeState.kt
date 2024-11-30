@@ -1,4 +1,4 @@
-package com.faridnia.khoroojyar.ui
+package com.faridnia.khoroojyar.presentation
 
 data class ExitTimeState(
     val enterTimeInput: String = "",

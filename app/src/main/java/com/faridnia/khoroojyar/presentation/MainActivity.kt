@@ -1,6 +1,5 @@
-package com.faridnia.khoroojyar
+package com.faridnia.khoroojyar.presentation
 
-import ExitTimeCalculatorScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent

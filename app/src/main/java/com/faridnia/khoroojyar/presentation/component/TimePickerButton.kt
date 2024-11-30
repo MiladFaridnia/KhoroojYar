@@ -1,4 +1,4 @@
-package com.faridnia.khoroojyar.ui.component
+package com.faridnia.khoroojyar.presentation.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.OutlinedButton
@@ -9,7 +9,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import com.faridnia.khoroojyar.R
-import com.faridnia.khoroojyar.ui.theme.KhoroojYarTheme
+import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 
 @Composable
 fun TimePickerButton(label: String, onClick: () -> Unit) {

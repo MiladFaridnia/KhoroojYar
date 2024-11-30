@@ -1,4 +1,4 @@
-package com.faridnia.khoroojyar.ui.theme
+package com.faridnia.khoroojyar.presentation.theme
 
 import android.app.Activity
 import android.os.Build

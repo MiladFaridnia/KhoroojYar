@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.faridnia.khoroojyar.R
-import com.faridnia.khoroojyar.ui.theme.KhoroojYarTheme
+import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 
 @Composable
 fun CalculateRemainedDaysOff(

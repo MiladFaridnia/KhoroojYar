@@ -1,4 +1,4 @@
-package com.faridnia.khoroojyar.ui.component
+package com.faridnia.khoroojyar.presentation.component
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.faridnia.khoroojyar.R
-import com.faridnia.khoroojyar.ui.theme.KhoroojYarTheme
+import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)

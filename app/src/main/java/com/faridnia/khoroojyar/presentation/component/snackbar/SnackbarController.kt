@@ -1,4 +1,4 @@
-package com.faridnia.khoroojyar.ui.component.snackbar
+package com.faridnia.khoroojyar.presentation.component.snackbar
 
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow

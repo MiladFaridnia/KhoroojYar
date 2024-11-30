@@ -1,9 +1,9 @@
-package com.faridnia.khoroojyar.ui
+package com.faridnia.khoroojyar.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.faridnia.khoroojyar.ui.component.snackbar.SnackbarController
-import com.faridnia.khoroojyar.ui.component.snackbar.SnackbarEvent
+import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarController
+import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarEvent
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

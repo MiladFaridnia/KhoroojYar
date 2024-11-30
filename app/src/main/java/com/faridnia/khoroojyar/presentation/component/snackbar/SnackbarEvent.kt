@@ -1,4 +1,4 @@
-package com.faridnia.khoroojyar.ui.component.snackbar
+package com.faridnia.khoroojyar.presentation.component.snackbar
 
 data class SnackbarEvent(
     val message: String,
