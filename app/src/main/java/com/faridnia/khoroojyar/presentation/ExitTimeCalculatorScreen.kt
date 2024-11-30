@@ -1,3 +1,5 @@
+package com.faridnia.khoroojyar.presentation
+
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,10 +40,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.faridnia.khoroojyar.R
 import com.faridnia.khoroojyar.presentation.calculate_days_off.CalculateRemainedDaysOff
-import com.faridnia.khoroojyar.ui.ExitTimeViewModel
-import com.faridnia.khoroojyar.ui.component.TimePickerButton
-import com.faridnia.khoroojyar.ui.component.TimePickerDialog
-import com.faridnia.khoroojyar.ui.theme.KhoroojYarTheme
+import com.faridnia.khoroojyar.presentation.component.TimePickerButton
+import com.faridnia.khoroojyar.presentation.component.TimePickerDialog
+import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)

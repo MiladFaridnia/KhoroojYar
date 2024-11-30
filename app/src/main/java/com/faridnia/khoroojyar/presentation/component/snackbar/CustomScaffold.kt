@@ -14,9 +14,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.faridnia.khoroojyar.ui.component.snackbar.ObserveAsEvents
-import com.faridnia.khoroojyar.ui.component.snackbar.SnackbarController
-import com.faridnia.khoroojyar.ui.component.snackbar.SnackbarType
+import com.faridnia.khoroojyar.presentation.component.snackbar.ObserveAsEvents
+import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarController
+import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarType
 import kotlinx.coroutines.launch
 
 @Composable
