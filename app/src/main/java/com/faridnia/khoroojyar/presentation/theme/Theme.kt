@@ -75,7 +75,7 @@ fun myDarkColorScheme(): ColorScheme = ColorScheme(
     tertiaryContainer = Fence_Green,
     onTertiaryContainer = Ocean_Blue,
 
-    background = Void,
+    background = Void_Color,
     onBackground = Color.White,
 
     surface = Cyprus,
@@ -85,7 +85,7 @@ fun myDarkColorScheme(): ColorScheme = ColorScheme(
 
     surfaceTint = Caribbean_Green,
     inverseSurface = Color.White,
-    inverseOnSurface = Void,
+    inverseOnSurface = Void_Color,
 
     error = Color(0xFFCF6679),
     onError = Color.White,
@@ -93,16 +93,16 @@ fun myDarkColorScheme(): ColorScheme = ColorScheme(
     onErrorContainer = Color(0xFFFFDAD4),
 
     outline = Fence_Green,
-    outlineVariant = Void,
+    outlineVariant = Void_Color,
     scrim = Color(0x99000000),
 
     surfaceBright = Cyprus,
     surfaceContainer = Cyprus,
-    surfaceContainerHigh = Void,
-    surfaceContainerHighest = Void,
+    surfaceContainerHigh = Void_Color,
+    surfaceContainerHighest = Void_Color,
     surfaceContainerLow = Cyprus,
-    surfaceContainerLowest = Void,
-    surfaceDim = Void,
+    surfaceContainerLowest = Void_Color,
+    surfaceDim = Void_Color,
 )
 
 
