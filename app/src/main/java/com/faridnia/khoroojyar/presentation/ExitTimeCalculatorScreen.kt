@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -45,6 +46,7 @@ import com.faridnia.khoroojyar.presentation.component.DateButton
 import com.faridnia.khoroojyar.presentation.component.DateButtonType
 import com.faridnia.khoroojyar.presentation.component.LightAndDarkPreview
 import com.faridnia.khoroojyar.presentation.component.TimePickerDialog
+import com.faridnia.khoroojyar.presentation.component.employee_commute.EmployeeCommute
 import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 import java.util.Locale
 
@@ -87,6 +89,11 @@ fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
+                EmployeeCommute(Modifier.wrapContentSize())
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 DateButton(
                     label = state.enterTimeInput.ifEmpty { stringResource(R.string.enter_your_entry_time_hh_mm) },
                     dateButtonType = DateButtonType.TIME,
