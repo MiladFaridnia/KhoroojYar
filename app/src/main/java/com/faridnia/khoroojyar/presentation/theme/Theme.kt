@@ -81,7 +81,7 @@ fun myDarkColorScheme(): ColorScheme = ColorScheme(
     surface = Cyprus,
     onSurface = Color.White,
     surfaceVariant = Fence_Green,
-    onSurfaceVariant = Color.White,
+    onSurfaceVariant = Light_Green,
 
     surfaceTint = Caribbean_Green,
     inverseSurface = Color.White,

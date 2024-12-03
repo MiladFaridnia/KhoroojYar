@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -40,13 +41,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.faridnia.khoroojyar.R
 import com.faridnia.khoroojyar.presentation.calculate_days_off.CalculateRemainedDaysOff
 import com.faridnia.khoroojyar.presentation.component.CustomBox
-import com.faridnia.khoroojyar.presentation.component.CustomCard
 import com.faridnia.khoroojyar.presentation.component.CustomText
 import com.faridnia.khoroojyar.presentation.component.DateButton
 import com.faridnia.khoroojyar.presentation.component.DateButtonType
 import com.faridnia.khoroojyar.presentation.component.LightAndDarkPreview
 import com.faridnia.khoroojyar.presentation.component.TimePickerDialog
 import com.faridnia.khoroojyar.presentation.component.employee_commute.EmployeeCommute
+import com.faridnia.khoroojyar.presentation.component.home.DateItem
+import com.faridnia.khoroojyar.presentation.component.home.DateTimeHeader
+import com.faridnia.khoroojyar.presentation.component.home.GreetingWithIcon
+import com.faridnia.khoroojyar.presentation.component.home.ProgressBarWithMessage
 import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 import java.util.Locale
 
@@ -81,90 +85,107 @@ fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
         modifier = Modifier
             .fillMaxSize()
     ) {
-        CustomCard(modifier = Modifier.padding(8.dp)) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
 
-                EmployeeCommute(Modifier.wrapContentSize())
+            GreetingWithIcon(
+                greetingText = "Hi Agha Milad",
+                subText = "Good Morning",
+                icon = painterResource(R.drawable.ic_sun)
+            )
 
+            DateTimeHeader(
+                firstDate = DateItem("27 September", "Saturday"),
+                secondDate = DateItem("Shahrivar", "17")
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            ProgressBarWithMessage(percentage = 37, amount = "0f 31 days")
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            EmployeeCommute(Modifier.wrapContentSize())
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            DateButton(
+                label = state.enterTimeInput.ifEmpty { stringResource(R.string.enter_your_entry_time_hh_mm) },
+                dateButtonType = DateButtonType.TIME,
+                onClick = { showEnterTimePickerDialog = true },
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            DateButton(
+                label = state.exitTimeInput.ifEmpty { stringResource(R.string.enter_your_exit_time_optional) },
+                dateButtonType = DateButtonType.TIME,
+                onClick = { showExitTimePickerDialog = true }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            state.totalTimeSpent.takeIf { it.isNotEmpty() }?.let {
                 Spacer(modifier = Modifier.height(8.dp))
-
-                DateButton(
-                    label = state.enterTimeInput.ifEmpty { stringResource(R.string.enter_your_entry_time_hh_mm) },
-                    dateButtonType = DateButtonType.TIME,
-                    onClick = { showEnterTimePickerDialog = true },
+                CustomText(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = Color(0xFF35BD69),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(8.dp),
+                    text = it,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color(0xFF35BD69),
+                    textAlign = TextAlign.Center
                 )
+            }
 
+            state.exitTime.takeIf { it.isNotEmpty() }?.let {
                 Spacer(modifier = Modifier.height(8.dp))
-
-                DateButton(
-                    label = state.exitTimeInput.ifEmpty { stringResource(R.string.enter_your_exit_time_optional) },
-                    dateButtonType = DateButtonType.TIME,
-                    onClick = { showExitTimePickerDialog = true }
+                CustomText(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = Color(0xFF35BD69),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(8.dp),
+                    text = stringResource(R.string.exit_time, state.exitTime),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Color(0xFF35BD69),
+                    textAlign = TextAlign.Center
                 )
+            }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                state.totalTimeSpent.takeIf { it.isNotEmpty() }?.let {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    CustomText(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(
-                                width = 1.dp,
-                                color = Color(0xFF35BD69),
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .padding(8.dp),
-                        text = it,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color(0xFF35BD69),
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                state.exitTime.takeIf { it.isNotEmpty() }?.let {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    CustomText(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(
-                                width = 1.dp,
-                                color = Color(0xFF35BD69),
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .padding(8.dp),
-                        text = stringResource(R.string.exit_time, state.exitTime),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = Color(0xFF35BD69),
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                state.vacationMessage.takeIf { it.isNotEmpty() }?.let {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    CustomText(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(
-                                width = 1.dp,
-                                color = MaterialTheme.colorScheme.error,
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .padding(8.dp),
-                        text = it,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.error,
-                        textAlign = TextAlign.Center
-                    )
-                }
+            state.vacationMessage.takeIf { it.isNotEmpty() }?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                CustomText(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.error,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(8.dp),
+                    text = it,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center
+                )
             }
         }
+        //  }
 
         FloatingActionButton(
             onClick = { viewModel.onFabClicked() },
