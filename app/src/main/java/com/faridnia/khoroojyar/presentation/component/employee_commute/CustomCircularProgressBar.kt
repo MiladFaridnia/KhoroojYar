@@ -32,7 +32,7 @@ import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 import com.faridnia.khoroojyar.presentation.theme.Ocean_Blue
 
 @Composable
-fun CustomProgressBar(
+fun CustomCircularProgressBar(
     title: String,
     size: Dp,
     progress: Float // Progress as a percentage (0f to 100f)
@@ -100,7 +100,7 @@ fun CustomProgressBar(
 @Composable
 fun PreviewCustomProgressBard() {
     KhoroojYarTheme {
-        CustomProgressBar(
+        CustomCircularProgressBar(
             title = "Hours Worked",
             size = 100.dp,
             progress = 66f

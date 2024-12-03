@@ -36,7 +36,7 @@ fun EmployeeCommute(modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CustomProgressBar(
+            CustomCircularProgressBar(
                 title = "Hours Worked",
                 progress = 68f,
                 size = 100.dp
