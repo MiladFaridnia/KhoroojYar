@@ -5,18 +5,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.faridnia.khoroojyar.R
 import com.faridnia.khoroojyar.presentation.component.CustomText
@@ -24,7 +23,11 @@ import com.faridnia.khoroojyar.presentation.component.LightAndDarkPreview
 import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 
 @Composable
-fun WorkingHourItem(modifier: Modifier = Modifier) {
+fun WorkingHourItem(
+    modifier: Modifier = Modifier,
+    title: String,
+    time: String? = null
+) {
     Row(
         modifier
             .fillMaxWidth()
@@ -44,17 +47,18 @@ fun WorkingHourItem(modifier: Modifier = Modifier) {
         )
 
         Column(Modifier.padding(horizontal = 16.dp)) {
-            CustomText(text = "Saturday", style = MaterialTheme.typography.titleMedium)
+            CustomText(text = title, style = MaterialTheme.typography.titleMedium)
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 CustomText(
+                    textAlign = TextAlign.Left,
                     modifier = Modifier.weight(1f),
-                    text = "9:00 - 14:00", style = MaterialTheme.typography.bodySmall
+                    text = time ?: "00:00 - 00:00", style = MaterialTheme.typography.bodySmall
                 )
-                VerticalDivider(
+                /*VerticalDivider(
                     modifier = Modifier
                         .height(10.dp)
                         .background(MaterialTheme.colorScheme.primary),
@@ -62,7 +66,7 @@ fun WorkingHourItem(modifier: Modifier = Modifier) {
                 )
                 CustomText(
                     modifier = Modifier.weight(1f),
-                    text = "14:47 - 18:00", style = MaterialTheme.typography.bodySmall
+                    text = "00:00 - 00:00", style = MaterialTheme.typography.bodySmall
                 )
 
                 VerticalDivider(
@@ -74,8 +78,8 @@ fun WorkingHourItem(modifier: Modifier = Modifier) {
                 )
                 CustomText(
                     modifier = Modifier.weight(1f),
-                    text = "14:47 - 18:00", style = MaterialTheme.typography.bodySmall
-                )
+                    text = "00:00 - 00:00", style = MaterialTheme.typography.bodySmall
+                )*/
 
             }
         }
@@ -87,6 +91,6 @@ fun WorkingHourItem(modifier: Modifier = Modifier) {
 @Composable
 fun PreviewWorkingHourItem(modifier: Modifier = Modifier) {
     KhoroojYarTheme {
-        WorkingHourItem()
+        WorkingHourItem(title = "Time Off", time = "18:23 - 20:23")
     }
 }
