@@ -6,7 +6,7 @@ plugins {
 
 android {
     val versionMajor = 1
-    val versionMinor = 13
+    val versionMinor = 14
     val versionPatch = 0
     val appName = "KhoroojYar"
     val appVersionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
@@ -89,5 +89,8 @@ dependencies {
     // Optional: Debugging and Tooling
     debugImplementation(libs.ui.tooling)
     implementation(libs.ui.tooling.preview)
+
+    //Persian Date Picker
+    implementation (libs.compose.persian.date.picker)
 
 }
