@@ -42,7 +42,7 @@ fun CustomCircularProgressBar(
         modifier = Modifier
             .wrapContentSize()
             .background(MaterialTheme.colorScheme.primary)
-            .padding(6.dp),
+            .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(

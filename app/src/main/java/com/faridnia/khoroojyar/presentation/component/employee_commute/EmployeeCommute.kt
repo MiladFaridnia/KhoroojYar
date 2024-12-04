@@ -21,7 +21,13 @@ import com.faridnia.khoroojyar.presentation.component.LightAndDarkPreview
 import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 
 @Composable
-fun EmployeeCommute(modifier: Modifier = Modifier) {
+fun EmployeeCommute(
+    modifier: Modifier = Modifier,
+    enterLabel: String,
+    exitLabel: String,
+    enterOnClick: () -> Unit,
+    exitOnClick: () -> Unit
+) {
     ElevatedCard(
         shape = RoundedCornerShape(30.dp),
         modifier = modifier
@@ -52,14 +58,15 @@ fun EmployeeCommute(modifier: Modifier = Modifier) {
 
             Column(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
                 InOutHorizontalComponent(
                     title = "Enter Time",
-                    detail = "00:00",
-                    icon = R.drawable.ic_in
+                    detail = enterLabel,
+                    icon = R.drawable.ic_in,
+                    onClick = enterOnClick
                 )
 
                 HorizontalDivider(
@@ -67,9 +74,10 @@ fun EmployeeCommute(modifier: Modifier = Modifier) {
                 )
 
                 InOutHorizontalComponent(
+                    icon = R.drawable.ic_out,
                     title = "Exit Time",
-                    detail = "00:00",
-                    icon = R.drawable.ic_out
+                    detail = exitLabel,
+                    onClick = exitOnClick
                 )
             }
         }
@@ -80,6 +88,12 @@ fun EmployeeCommute(modifier: Modifier = Modifier) {
 @Composable
 fun PreviewEmployeeCommute(modifier: Modifier = Modifier) {
     KhoroojYarTheme {
-        EmployeeCommute(Modifier.wrapContentSize())
+        EmployeeCommute(
+            Modifier.wrapContentSize(),
+            enterLabel = "00:00",
+            exitLabel = "18:00",
+            enterOnClick = { },
+            exitOnClick = {}
+        )
     }
 }
