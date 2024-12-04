@@ -12,35 +12,35 @@ private val LightColorScheme = myLightColorScheme()
 
 fun myLightColorScheme(): ColorScheme = ColorScheme(
     primary = Caribbean_Green,
-    onPrimary = Color.White,
+    onPrimary = Light_Green,
     primaryContainer = Honeydew,
     onPrimaryContainer = Fence_Green,
     inversePrimary = Light_Blue,
 
     secondary = Light_Blue,
-    onSecondary = Color.White,
+    onSecondary = Light_Green,
     secondaryContainer = Ocean_Blue,
     onSecondaryContainer = Light_Blue,
 
     tertiary = Ocean_Blue,
-    onTertiary = Color.White,
+    onTertiary = Light_Green,
     tertiaryContainer = Honeydew,
     onTertiaryContainer = Ocean_Blue,
 
-    background = Honeydew,
+    background = Caribbean_Green,
     onBackground = Fence_Green,
 
-    surface = Color.White,
+    surface = Light_Green,
     onSurface = Fence_Green,
     surfaceVariant = Light_Green,
     onSurfaceVariant = Fence_Green,
 
     surfaceTint = Caribbean_Green,
     inverseSurface = Fence_Green,
-    inverseOnSurface = Color.White,
+    inverseOnSurface = Light_Green,
 
     error = Color(0xFFB00020),
-    onError = Color.White,
+    onError = Light_Green,
     errorContainer = Color(0xFFFFDAD4),
     onErrorContainer = Color(0xFF8C1D18),
 
@@ -48,47 +48,47 @@ fun myLightColorScheme(): ColorScheme = ColorScheme(
     outlineVariant = Light_Green,
     scrim = Color(0x1F000000),
 
-    surfaceBright = Color.White,
+    surfaceBright = Honeydew,
     surfaceContainer = Honeydew,
-    surfaceContainerHigh = Honeydew,
-    surfaceContainerHighest = Honeydew,
-    surfaceContainerLow = Color.White,
-    surfaceContainerLowest = Honeydew,
+    surfaceContainerHigh = Light_Green,
+    surfaceContainerHighest = Light_Green,
+    surfaceContainerLow = Cyprus,
+    surfaceContainerLowest = Fence_Green,
     surfaceDim = Light_Green,
 )
 
 
 fun myDarkColorScheme(): ColorScheme = ColorScheme(
     primary = Caribbean_Green,
-    onPrimary = Color.White,
+    onPrimary = Light_Green,
     primaryContainer = Fence_Green,
     onPrimaryContainer = Caribbean_Green,
     inversePrimary = Light_Blue,
 
     secondary = Light_Blue,
-    onSecondary = Color.White,
+    onSecondary = Light_Green,
     secondaryContainer = Ocean_Blue,
     onSecondaryContainer = Light_Blue,
 
     tertiary = Ocean_Blue,
-    onTertiary = Color.White,
+    onTertiary = Light_Green,
     tertiaryContainer = Fence_Green,
     onTertiaryContainer = Ocean_Blue,
 
     background = Void_Color,
-    onBackground = Color.White,
+    onBackground = Light_Green,
 
     surface = Cyprus,
-    onSurface = Color.White,
+    onSurface = Light_Green,
     surfaceVariant = Fence_Green,
     onSurfaceVariant = Light_Green,
 
     surfaceTint = Caribbean_Green,
-    inverseSurface = Color.White,
+    inverseSurface = Light_Green,
     inverseOnSurface = Void_Color,
 
     error = Color(0xFFCF6679),
-    onError = Color.White,
+    onError = Light_Green,
     errorContainer = Color(0xFF8C1D18),
     onErrorContainer = Color(0xFFFFDAD4),
 
@@ -96,12 +96,12 @@ fun myDarkColorScheme(): ColorScheme = ColorScheme(
     outlineVariant = Void_Color,
     scrim = Color(0x99000000),
 
-    surfaceBright = Cyprus,
-    surfaceContainer = Cyprus,
-    surfaceContainerHigh = Void_Color,
-    surfaceContainerHighest = Void_Color,
-    surfaceContainerLow = Cyprus,
-    surfaceContainerLowest = Void_Color,
+    surfaceBright = Void_Color,
+    surfaceContainer = Void_Color,
+    surfaceContainerHigh = Fence_Green,
+    surfaceContainerHighest = Caribbean_Green,
+    surfaceContainerLow = Light_Green,
+    surfaceContainerLowest = Honeydew,
     surfaceDim = Void_Color,
 )
 

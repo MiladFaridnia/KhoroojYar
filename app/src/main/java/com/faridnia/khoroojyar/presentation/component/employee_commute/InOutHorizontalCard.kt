@@ -22,10 +22,9 @@ fun InOutHorizontalCard(
             .padding(8.dp)
             .wrapContentWidth()
     ) {
-        InOutHorizontalComponent(icon, title, detail)
+        InOutHorizontalComponent(icon, title, detail){}
     }
 }
-
 
 @LightAndDarkPreview
 @Composable

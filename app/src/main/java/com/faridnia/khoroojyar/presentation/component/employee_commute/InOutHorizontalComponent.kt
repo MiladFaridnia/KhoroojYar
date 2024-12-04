@@ -1,5 +1,6 @@
 package com.faridnia.khoroojyar.presentation.component.employee_commute
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,10 +20,11 @@ import com.faridnia.khoroojyar.presentation.component.CustomText
 import com.faridnia.khoroojyar.presentation.theme.Void_Color
 
 @Composable
-fun InOutHorizontalComponent(icon: Int, title: String, detail: String) {
+fun InOutHorizontalComponent(icon: Int, title: String, detail: String, onClick: () -> Unit) {
     Row(
         modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable { onClick() },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
