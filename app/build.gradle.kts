@@ -6,7 +6,7 @@ plugins {
 
 android {
     val versionMajor = 1
-    val versionMinor = 14
+    val versionMinor = 15
     val versionPatch = 0
     val appName = "KhoroojYar"
     val appVersionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
@@ -26,7 +26,19 @@ android {
 
     buildTypes {
         getByName("release") {
+            isDebuggable = false
             isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+
+        getByName("debug") {
+            isDebuggable = true
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -43,7 +55,8 @@ android {
             val outputImpl = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
 //                val buildType = variant.buildType.name
             val buildType = name.split("-")[0]
-            outputImpl.outputFileName = "${appName}-${buildType}-v${appVersionName}-c${appVersionCode}.apk"
+            outputImpl.outputFileName =
+                "${appName}-${buildType}-v${appVersionName}-c${appVersionCode}.apk"
         }
     }
 
@@ -91,6 +104,6 @@ dependencies {
     implementation(libs.ui.tooling.preview)
 
     //Persian Date Picker
-    implementation (libs.compose.persian.date.picker)
+    implementation(libs.compose.persian.date.picker)
 
 }
