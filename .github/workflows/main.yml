@@ -6,27 +6,32 @@ on:
   pull_request:
     branches: [ master ]
 
+
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
-    steps: 
-      - name: Checkout
-        uses: actions/checkout@v4
+    steps:
+    - uses: actions/checkout@v4
+    - name: set up JDK 11
+      uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: gradle
 
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: Build with Gradle
+      run: ./gradlew build
 
-      - name: Build with Gradle
-        run: ./gradlew build
 
-      - name: Debug APK Directory
-        run: ls -R app/release/
+    - name: Debug APK Directory
+      run: ls -R app/release/
 
-      - name: Upload APK file
-        uses: actions/upload-artifact@v3
-        with:
-          name: app
-          path: app/release/**/*.apk
+    - name: Upload APK file
+      uses: actions/upload-artifact@v3
+      with:
+        name: app
+        path: app/release/**/*.apk
