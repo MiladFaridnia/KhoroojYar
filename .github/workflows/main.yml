@@ -3,8 +3,9 @@ name: Android CI
 on: 
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
+# Uncomment the following lines if you also want to run this workflow on pull requests:
+#   pull_request:
+#     branches: [ master ]
 
 jobs:
   build:
@@ -12,9 +13,21 @@ jobs:
 
     steps:
       # Step 1: Checkout Code
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
 
-      # Step 2: Set up JDK 17
+      # Step 2: Cache Gradle Dependencies
+      # This step caches the Gradle dependencies to improve build times by avoiding redownloading dependencies.
+      # The `key` is based on the content of Gradle-related files (e.g., build.gradle, settings.gradle).
+      - name: Cache Gradle Dependencies
+        uses: actions/cache@v4.2.0
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/*.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # Step 3: Set up JDK 17
+      # This step ensures Java 17 is installed as it is required by the Android Gradle Plugin.
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -22,21 +35,25 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # Step 3: Grant execute permissions to Gradle Wrapper
+      # Step 4: Grant execute permissions to Gradle Wrapper
+      # Ensures that the Gradle Wrapper script has the necessary execution permissions.
       - name: Grant execute permission for Gradlew
         run: chmod +x gradlew
 
-      # Step 4: Build with Gradle
+      # Step 5: Build with Gradle
+      # Runs the Gradle task to assemble the release APK.
       - name: Build with Gradle
         run: ./gradlew assembleRelease
 
-      # Step 5: Debug APK Directory
+      # Step 6: Debug APK Directory
+      # Outputs the directory structure of the APK folder for troubleshooting purposes.
       - name: Debug APK Directory
         run: ls -R app/build/outputs/apk/release/
 
-      # Step 6: Upload APK file
+      # Step 7: Upload APK file
+      # Uploads the generated APK as a build artifact, making it available for download.
       - name: Upload APK file
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.4.3
         with:
           name: KhoroojYar-APK
           path: app/build/outputs/apk/release/*.apk
