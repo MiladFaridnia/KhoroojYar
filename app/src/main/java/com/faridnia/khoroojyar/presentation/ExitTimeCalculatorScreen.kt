@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -108,7 +109,7 @@ fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
 
                 DateTimeHeader(
                     firstDate = DateItem(dayOfMonth, dayOfWeek),
-                    secondDate = DateItem(persianMonthName ?: "" , persianDay )
+                    secondDate = DateItem(persianMonthName ?: "", persianDay)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -118,8 +119,7 @@ fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
             }
 
             ExtraRoundCard(
-                modifier = Modifier
-                    .weight(1f)
+                modifier = Modifier.weight(1f)
             ) {
 
                 EmployeeCommute(
@@ -162,24 +162,67 @@ fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                 ) {
-                    state.totalTimeSpent.takeIf { it.isNotEmpty() }?.let { totalTime ->
+
+                    state.timeWorked?.let {
                         item {
-                            WorkingHourItem(title = "Summary", time = totalTime)
+                            WorkingHourItem(
+                                title = "Time Worked",
+                                time = it.startToEndTime,
+                                timeDuration = it.duration,
+                                iconId = R.drawable.ic_timer
+                            )
+                        }
+                    }
+
+                    state.overtime?.let {
+                        item {
+                            WorkingHourItem(
+                                title = "Overtime",
+                                time = it.startToEndTime,
+                                timeDuration = it.duration,
+                                iconId = R.drawable.ic_time_stop
+                            )
                         }
                     }
 
                     state.exitTime.takeIf { it.isNotEmpty() }?.let { exitTime ->
                         item {
-                            WorkingHourItem(title = "Exit Time", time = exitTime)
+                            WorkingHourItem(
+                                title = "Exit Time",
+                                timeDuration = exitTime,
+                                iconId = R.drawable.ic_exiting_employee
+                            )
                         }
                     }
 
-                    state.vacationMessage.takeIf { it.isNotEmpty() }?.let {
-                        item {
-                            WorkingHourItem(title = "Time Off", time = it)
+                    state.vacationList.takeIf { it.isNotEmpty() }?.let { vacationList ->
+                        val ordinalSuffixes = listOf(
+                            "First",
+                            "Second",
+                            "Third",
+                            "Fourth",
+                            "Fifth",
+                            "Sixth",
+                            "Seventh",
+                            "Eighth",
+                            "Ninth",
+                            "Tenth"
+                        )
+
+                        itemsIndexed(vacationList) { index: Int, item: TimeSegment ->
+                            val title = when (vacationList.size) {
+                                1 -> "Time Off"
+                                else -> "${ordinalSuffixes.getOrElse(index) { "${index + 1}th" }} Time Off"
+                            }
+
+                            WorkingHourItem(
+                                title = title,
+                                time = item.startToEndTime,
+                                timeDuration = item.duration,
+                                iconId = R.drawable.ic_timer_pause
+                            )
                         }
                     }
-
                 }
 
                 /* DateButton(
