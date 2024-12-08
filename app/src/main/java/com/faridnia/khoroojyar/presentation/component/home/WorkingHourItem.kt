@@ -1,5 +1,6 @@
 package com.faridnia.khoroojyar.presentation.component.home
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,7 +27,9 @@ import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 fun WorkingHourItem(
     modifier: Modifier = Modifier,
     title: String,
-    time: String? = null
+    time: String? = null,
+    timeDuration: String? = null,
+    @DrawableRes iconId: Int? = null
 ) {
     Row(
         modifier
@@ -41,12 +44,12 @@ fun WorkingHourItem(
                 .clip(RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colorScheme.secondary)
                 .padding(8.dp),
-            painter = painterResource(id = R.drawable.ic_sun),
+            painter = painterResource(id = iconId ?: R.drawable.ic_sun),
             contentDescription = "",
             tint = MaterialTheme.colorScheme.onSecondary,
         )
 
-        Column(Modifier.padding(horizontal = 16.dp)) {
+        Column(Modifier.padding(horizontal = 16.dp).weight(1f)) {
             CustomText(text = title, style = MaterialTheme.typography.titleMedium)
 
             Row(
@@ -83,6 +86,9 @@ fun WorkingHourItem(
 
             }
         }
+        timeDuration?.let {
+            CustomText(text = timeDuration, style = MaterialTheme.typography.titleMedium)
+        }
     }
 }
 
@@ -91,6 +97,6 @@ fun WorkingHourItem(
 @Composable
 fun PreviewWorkingHourItem(modifier: Modifier = Modifier) {
     KhoroojYarTheme {
-        WorkingHourItem(title = "Time Off", time = "18:23 - 20:23")
+        WorkingHourItem(title = "Time Off", time = "18:23 - 20:23", timeDuration = "2:00")
     }
 }

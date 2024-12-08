@@ -60,7 +60,7 @@ class ExitTimeViewModel : ViewModel() {
     private fun calculateTime() {
         try {
             val enterTime = LocalTime.parse(_state.value.enterTimeInput, timeFormatter)
-            if (_state.value.exitTimeInput.isNotEmpty()) {
+            if (_state.value.isExitTimeEntered()) {
                 handleExitTimeProvided(enterTime)
             } else {
                 handleNoExitTime(enterTime)
@@ -108,7 +108,13 @@ class ExitTimeViewModel : ViewModel() {
         if (enterTime.isAfter(LocalTime.of(9, 0))) {
             updateLateStartState(enterTime)
         } else {
-            _state.update { it.copy(vacationMessage = "") }
+            _state.update { currentState ->
+                currentState.copy(
+                    timeWorked = null,
+                    overtime = null,
+                    vacationList = emptyList()
+                )
+            }
             calculateAndUpdateDefaultExitTime(enterTime)
         }
     }
@@ -120,58 +126,65 @@ class ExitTimeViewModel : ViewModel() {
         overtime: Duration
     ) {
         val totalTimeWorked = Duration.between(enterTime, exitTime)
-        val hoursWorked = totalTimeWorked.toHours()
-        val minutesWorked = totalTimeWorked.toMinutes() % 60
+        val totalTimeWorkedHours = totalTimeWorked.toHours().toInt()
+        val totalTimeWorkedMinutes = (totalTimeWorked.toMinutes() % 60).toInt()
 
-        val lateHours = lateEntryTimeOff.toHours()
-        val lateMinutes = lateEntryTimeOff.toMinutes() % 60
+        val timeWorkedDuration = String.format(
+            Locale.US,
+            "%02d:%02d",
+            totalTimeWorkedHours,
+            totalTimeWorkedMinutes
+        )
 
-        val overtimeHours = overtime.toHours()
-        val overtimeMinutes = overtime.toMinutes() % 60
+        val timeWorkedSegment = TimeSegment(
+            startTime = enterTime.toString(),
+            endTime = exitTime.toString(),
+            duration = timeWorkedDuration
+        )
+
+        val overtimeSegment = if (!overtime.isZero) {
+            val overtimeHours = overtime.toHours().toInt()
+            val overtimeMinutes = (overtime.toMinutes() % 60).toInt()
+
+            TimeSegment(
+                startTime = exitTime.toString(),
+                endTime = exitTime.plusHours(overtimeHours.toLong()).plusMinutes(overtimeMinutes.toLong()).toString(),
+                duration = String.format(
+                    Locale.US,
+                    "%02d:%02d",
+                    overtimeHours,
+                    overtimeMinutes
+                )
+            )
+        } else {
+            null
+        }
 
         _state.update { currentState ->
             currentState.copy(
                 exitTime = "",
-                totalTimeSpent = buildString {
-                    append(
-                        String.format(
-                            Locale.US,
-                            "Time worked:\n %02d hours and %02d minutes",
-                            hoursWorked,
-                            minutesWorked
-                        )
-                    )
-                    if (!lateEntryTimeOff.isZero) {
-                        append(
-                            String.format(
-                                Locale.US,
-                                "\nTime off:\n %02d hours and %02d minutes",
-                                lateHours,
-                                lateMinutes
-                            )
-                        )
-                    }
-                    if (!overtime.isZero) {
-                        append(
-                            String.format(
-                                Locale.US,
-                                "\nOvertime:\n %02d hours and %02d minutes",
-                                overtimeHours,
-                                overtimeMinutes
-                            )
-                        )
-                    }
-                }
+                timeWorked = timeWorkedSegment,
+                overtime = overtimeSegment
             )
         }
     }
 
     private fun updateLateStartState(enterTime: LocalTime) {
+        val vacationStart = latestStart
+        val vacationDuration = Duration.between(vacationStart, enterTime)
+
         _state.update { currentState ->
             currentState.copy(
-                vacationMessage = "Time Off:\n -> ${latestStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}",
                 exitTime = "17:45",
-                totalTimeSpent = ""
+                timeWorked = null,
+                overtime = null,
+                vacationList = listOf(
+                    TimeSegment(
+                        startTime = vacationStart.format(timeFormatter),
+                        endTime = enterTime.format(timeFormatter),
+                        duration = formatDuration(vacationDuration)
+                    )
+                )
             )
         }
     }
@@ -179,18 +192,26 @@ class ExitTimeViewModel : ViewModel() {
     private fun calculateAndUpdateDefaultExitTime(enterTime: LocalTime) {
         val exitTimeCalculated = enterTime.plusHours(8).plusMinutes(45)
         val totalTimeWorked = Duration.between(enterTime, exitTimeCalculated)
-        val hoursWorked = totalTimeWorked.toHours()
-        val minutesWorked = totalTimeWorked.toMinutes() % 60
+        val totalTimeWorkedHours = totalTimeWorked.toHours().toInt()
+        val totalTimeWorkedMinutes = (totalTimeWorked.toMinutes() % 60).toInt()
+
+        val timeWorkedDuration = String.format(
+            Locale.US,
+            "%02d:%02d",
+            totalTimeWorkedHours,
+            totalTimeWorkedMinutes
+        )
+
+        val timeWorkedSegment = TimeSegment(
+            startTime = enterTime.toString(),
+            endTime = exitTimeCalculated.toString(),
+            duration = timeWorkedDuration
+        )
 
         _state.update { currentState ->
             currentState.copy(
                 exitTime = exitTimeCalculated.format(timeFormatter),
-                totalTimeSpent = String.format(
-                    Locale.US,
-                    "Time worked:\n %02d hours and %02d minutes",
-                    hoursWorked,
-                    minutesWorked
-                )
+                timeWorked = timeWorkedSegment
             )
         }
     }
@@ -199,8 +220,9 @@ class ExitTimeViewModel : ViewModel() {
         _state.update { currentState ->
             currentState.copy(
                 exitTime = "Invalid time format",
-                vacationMessage = "",
-                totalTimeSpent = ""
+                timeWorked = null,
+                overtime = null,
+                vacationList = emptyList()
             )
         }
         showSnackbar("Invalid time format")
@@ -210,56 +232,55 @@ class ExitTimeViewModel : ViewModel() {
         _state.update { currentState ->
             currentState.copy(
                 exitTime = "Invalid exit time",
-                totalTimeSpent = ""
+                timeWorked = null,
+                overtime = null,
             )
         }
     }
 
     private fun calculateVacation(enterTime: LocalTime, exitTime: LocalTime) {
         val workedDuration = Duration.between(enterTime, exitTime)
+        val vacationList = mutableListOf<TimeSegment>()
 
-        if (exitTime == latestEnd && enterTime.isAfter(LocalTime.of(9, 0))) {
+        if (enterTime.isAfter(LocalTime.of(9, 0))) {
             val lateEntryVacationStart = LocalTime.of(9, 0)
-            _state.update { currentState ->
-                currentState.copy(
-                    vacationMessage = "Time off:\n ->${lateEntryVacationStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}"
+            val vacationDuration = Duration.between(lateEntryVacationStart, enterTime)
+            vacationList.add(
+                TimeSegment(
+                    startTime = lateEntryVacationStart.format(timeFormatter),
+                    endTime = enterTime.format(timeFormatter),
+                    duration = formatDuration(vacationDuration)
                 )
-            }
-            return
+            )
         }
 
         if (workedDuration < workDuration) {
             val missingDuration = workDuration.minus(workedDuration)
-            val vacationParts = mutableListOf<String>()
-
-            if (exitTime == latestEnd) {
-                val vacationStart = LocalTime.of(9, 0)
-                vacationParts.add("${vacationStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}")
-            } else {
-                if (exitTime.isBefore(latestEnd)) {
-                    val endVacationEnd = minOf(exitTime.plus(missingDuration), latestEnd)
-                    vacationParts.add("${exitTime.format(timeFormatter)} to ${endVacationEnd.format(timeFormatter)}")
-                }
-                val remainingMissing = missingDuration.minus(
-                    Duration.between(
-                        exitTime,
-                        minOf(exitTime.plus(missingDuration), latestEnd)
+            if (exitTime.isBefore(latestEnd)) {
+                val endVacationEnd = minOf(exitTime.plus(missingDuration), latestEnd)
+                val vacationDuration = Duration.between(exitTime, endVacationEnd)
+                vacationList.add(
+                    TimeSegment(
+                        startTime = exitTime.format(timeFormatter),
+                        endTime = endVacationEnd.format(timeFormatter),
+                        duration = formatDuration(vacationDuration)
                     )
                 )
-                if (!remainingMissing.isZero && enterTime.isAfter(earliestStart)) {
-                    val startVacationStart = maxOf(earliestStart, enterTime.minus(remainingMissing))
-                    vacationParts.add("-> ${startVacationStart.format(timeFormatter)} to ${enterTime.format(timeFormatter)}")
-                }
-            }
-
-            _state.update { currentState ->
-                currentState.copy(vacationMessage = "Time off:\n -> ${vacationParts.joinToString("\n ")}")
-            }
-        } else {
-            _state.update { currentState ->
-                currentState.copy(vacationMessage = "")
             }
         }
+
+        // Update state with the vacation list
+        _state.update { currentState ->
+            currentState.copy(
+                vacationList = vacationList
+            )
+        }
+    }
+
+    private fun formatDuration(duration: Duration): String {
+        val hours = duration.toHours()
+        val minutes = duration.toMinutes() % 60
+        return String.format(Locale.US, "%02d:%02d", hours, minutes)
     }
 
     private fun showSnackbar(message: String) {
@@ -277,7 +298,9 @@ class ExitTimeViewModel : ViewModel() {
             enterTimeInput = "",
             exitTimeInput = "",
             exitTime = "",
-            vacationMessage = ""
+            timeWorked = null,
+            overtime = null,
+            vacationList = emptyList()
         )
     }
 
