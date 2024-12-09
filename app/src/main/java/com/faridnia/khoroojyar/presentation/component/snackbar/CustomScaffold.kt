@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.faridnia.khoroojyar.presentation.component.bottom_navigation.BottomNavigationBar
 import com.faridnia.khoroojyar.presentation.component.snackbar.ObserveAsEvents
 import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarController
 import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarType
@@ -51,6 +52,7 @@ fun CustomScaffold(
     }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        bottomBar = { BottomNavigationBar() },
         snackbarHost = {
             Box(modifier = Modifier.fillMaxSize()) {
                 SnackbarHost(
