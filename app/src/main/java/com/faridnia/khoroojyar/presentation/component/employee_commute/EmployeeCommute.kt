@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.faridnia.khoroojyar.R
 import com.faridnia.khoroojyar.presentation.component.LightAndDarkPreview
+import com.faridnia.khoroojyar.presentation.component.Timer
 import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 
 @Composable
@@ -42,11 +44,13 @@ fun EmployeeCommute(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CustomCircularProgressBar(
+          /*  CustomCircularProgressBar(
                 title = "Hours Worked",
                 progress = 68f,
                 size = 100.dp
-            )
+            )*/
+
+            Timer(modifier = Modifier.size(100.dp))
 
             VerticalDivider(
                 modifier = Modifier
