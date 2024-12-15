@@ -21,7 +21,8 @@ fun ExtraRoundCard(
     Column(
         modifier
             .clip(RoundedCornerShape(topEnd = 50.dp, topStart = 50.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant).padding(top = 25.dp)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(top = 16.dp)
     ) {
         content()
     }
