@@ -20,7 +20,11 @@ import androidx.compose.ui.unit.dp
 import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 
 @Composable
-fun CustomProgressBar(percentage: Int, amount: String) {
+fun CustomProgressBar(
+    percentage: Int,
+    amount: String,
+    percentageTitle: String
+) {
     val backgroundColor = MaterialTheme.colorScheme.surfaceContainerHighest
     val progressColor = MaterialTheme.colorScheme.surfaceContainerLowest//Fence_Green
     val progressHeight = 20.dp
@@ -50,7 +54,7 @@ fun CustomProgressBar(percentage: Int, amount: String) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "$percentage%",
+                text = percentageTitle,
                 color = MaterialTheme.colorScheme.primaryContainer,
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -70,6 +74,6 @@ fun CustomProgressBar(percentage: Int, amount: String) {
 @Composable
 fun PreviewCustomProgressbar() {
     KhoroojYarTheme {
-        CustomProgressBar(percentage = 70, amount = "1000")
+        CustomProgressBar(percentage = 70, amount = "of 31 days", percentageTitle = "17 days")
     }
 }

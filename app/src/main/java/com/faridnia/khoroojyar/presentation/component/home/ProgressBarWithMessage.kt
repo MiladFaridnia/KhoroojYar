@@ -17,12 +17,14 @@ import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 fun ProgressBarWithMessage(
     modifier: Modifier = Modifier,
     percentage: Int,
-    amount: String
+    amount: String,
+    percentageTitle: String
 ) {
     Column(modifier = modifier) {
         CustomProgressBar(
             percentage = percentage,
-            amount = amount
+            amount = amount,
+            percentageTitle = percentageTitle
         )
 
         PercentagePassedMessage(percentage)
@@ -47,7 +49,8 @@ fun PreviewProgressBarWithMessage() {
     KhoroojYarTheme {
         ProgressBarWithMessage(
             percentage = 37,
-            amount = "0f 31 days"
+            amount = "0f 31 days",
+            percentageTitle = "17 days"
         )
     }
 }

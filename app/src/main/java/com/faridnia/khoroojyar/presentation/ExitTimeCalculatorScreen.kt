@@ -24,6 +24,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -71,6 +72,12 @@ fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
         )
     }
 
+    val monthPercentage by remember {
+        mutableIntStateOf(
+            ((PersianDatePickerController().getPersianDay().toLong() * 100 / 30L)).toInt()
+        )
+    }
+
     LaunchedEffect(viewModel.uiEvents) {
         viewModel.uiEvents.collect { event ->
             when (event) {
@@ -112,9 +119,13 @@ fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
                     secondDate = DateItem(persianMonthName ?: "", persianDay)
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
-                ProgressBarWithMessage(percentage = 37, amount = "0f 31 days")
+                ProgressBarWithMessage(
+                    percentage = monthPercentage,
+                    amount = "0f 30 days",
+                    percentageTitle = "$persianDay days "
+                )
 
             }
 
@@ -136,7 +147,7 @@ fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
                     modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(8.dp),
                     colors = CardDefaults.elevatedCardColors().copy(
                         containerColor = MaterialTheme.colorScheme.surface
                     )
@@ -145,14 +156,12 @@ fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
                         Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
                     ) {
-
                         CustomText(
                             text = "Working Hours Summary",
                             modifier = Modifier.padding(8.dp),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.primary,
                             textAlign = TextAlign.Center
-
                         )
                     }
                 }
