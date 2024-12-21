@@ -111,7 +111,7 @@ fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
                 GreetingWithIcon(
                     greetingText = "Hi Agha Milad",
                     subText = "Good Morning",
-                    icon = painterResource(R.drawable.ic_sun)
+                    icon = painterResource(R.drawable.ic_setting_2)
                 )
 
                 DateTimeHeader(
