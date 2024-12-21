@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
+import com.faridnia.khoroojyar.presentation.theme.Ocean_Blue
 
 @Composable
 fun CustomProgressBar(
@@ -55,7 +56,7 @@ fun CustomProgressBar(
         ) {
             Text(
                 text = percentageTitle,
-                color = MaterialTheme.colorScheme.primaryContainer,
+                color = Ocean_Blue,//MaterialTheme.colorScheme.primaryContainer,
                 style = MaterialTheme.typography.bodyMedium
             )
 
