@@ -51,39 +51,12 @@ fun WorkingHourItem(
 
         Column(Modifier.padding(horizontal = 16.dp).weight(1f)) {
             CustomText(text = title, style = MaterialTheme.typography.titleMedium)
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            time?.let {
                 CustomText(
                     textAlign = TextAlign.Left,
                     modifier = Modifier.weight(1f),
-                    text = time ?: "00:00 - 00:00", style = MaterialTheme.typography.bodySmall
+                    text = time, style = MaterialTheme.typography.bodySmall
                 )
-                /*VerticalDivider(
-                    modifier = Modifier
-                        .height(10.dp)
-                        .background(MaterialTheme.colorScheme.primary),
-                    thickness = 1.dp
-                )
-                CustomText(
-                    modifier = Modifier.weight(1f),
-                    text = "00:00 - 00:00", style = MaterialTheme.typography.bodySmall
-                )
-
-                VerticalDivider(
-                    modifier = Modifier
-                        .height(10.dp)
-                        .padding(horizontal = 8.dp)
-                        .background(MaterialTheme.colorScheme.primary),
-                    thickness = 1.dp
-                )
-                CustomText(
-                    modifier = Modifier.weight(1f),
-                    text = "00:00 - 00:00", style = MaterialTheme.typography.bodySmall
-                )*/
-
             }
         }
         timeDuration?.let {
