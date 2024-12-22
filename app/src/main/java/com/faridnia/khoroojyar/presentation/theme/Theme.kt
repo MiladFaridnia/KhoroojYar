@@ -1,10 +1,14 @@
 package com.faridnia.khoroojyar.presentation.theme
 
+import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
 
 private val DarkColorScheme = myDarkColorScheme()
 
@@ -112,11 +116,18 @@ fun KhoroojYarTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    val view = LocalView.current
+    val window = (view.context as Activity).window
+
+    window.statusBarColor = colorScheme.background.toArgb()
+    window.navigationBarColor = colorScheme.background.toArgb()
+
     val colorScheme = when {
-       /* dynamicColor -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }*/
+
+    /* dynamicColor -> {
+                    val context = LocalContext.current
+                     if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    }*/
 
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
