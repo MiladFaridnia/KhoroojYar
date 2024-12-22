@@ -18,7 +18,7 @@ KhoroojYar is a simple HR tool developed for calculating the enter and exit time
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/khoroojyar.git
+   git clone https://github.com/MiladFaridnia/KhoroojYar.git
 2. Open the project in Android Studio.
 3. Sync the project with Gradle files.
 4. Build and run the app on an Android device or emulator.

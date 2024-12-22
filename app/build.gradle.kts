@@ -2,11 +2,12 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
 }
 
 android {
     val versionMajor = 1
-    val versionMinor = 19
+    val versionMinor = 20
     val versionPatch = 0
     val appName = "KhoroojYar"
     val appVersionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
@@ -105,5 +106,14 @@ dependencies {
 
     //Persian Date Picker
     implementation(libs.compose.persian.date.picker)
+
+    //Data Store
+    implementation(libs.androidx.datastore.preferences)
+
+    // Dependency Injection
+    implementation (libs.hilt.android)
+    annotationProcessor(libs.hilt.android.compiler)
+//    kapt(libs.hilt.android.compiler)
+    implementation (libs.androidx.hilt.navigation.compose)
 
 }
