@@ -22,7 +22,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -54,11 +53,23 @@ import com.faridnia.khoroojyar.util.DateHelper
 import com.razaghimahdi.compose_persian_date.core.PersianDatePickerController
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    ExitTimeCalcContent(
+        state = state,
+        onEvent = viewModel::onEvent
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExitTimeCalcContent(
+    modifier: Modifier = Modifier,
+    state: ExitTimeState,
+    onEvent: (ExitTimeCalculatorEvent) -> Unit
+) {
     var showEnterTimePickerDialog by remember { mutableStateOf(false) }
     var showExitTimePickerDialog by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -78,15 +89,6 @@ fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
         )
     }
 
-    LaunchedEffect(viewModel.uiEvents) {
-        viewModel.uiEvents.collect { event ->
-            when (event) {
-                ExitTimeViewModel.UiEvent.ShowBottomSheet -> isBottomSheetVisible = true
-                ExitTimeViewModel.UiEvent.HideBottomSheet -> isBottomSheetVisible = false
-            }
-        }
-    }
-
     val onTimeConfirm: (TimePickerState, (String) -> Unit, (Boolean) -> Unit) -> Unit =
         { timePickerState, onTimeChange, closeDialog ->
             val selectedTime =
@@ -97,10 +99,7 @@ fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
 
     val scrollState = rememberScrollState()
 
-    CustomBox(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
+    CustomBox(modifier = modifier.fillMaxSize()) {
         Column(Modifier.scrollable(scrollState, orientation = Orientation.Vertical)) {
             Column(
                 modifier = Modifier.padding(vertical = 16.dp, horizontal = 30.dp),
@@ -197,7 +196,7 @@ fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
                     state.exitTime.takeIf { it.isNotEmpty() }?.let { exitTime ->
                         item {
                             WorkingHourItem(
-                                title = "Exit Time",
+                                title = stringResource(R.string.exit_time),
                                 timeDuration = exitTime,
                                 iconId = R.drawable.ic_exiting_employee
                             )
@@ -233,47 +232,6 @@ fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
                         }
                     }
                 }
-
-                /* DateButton(
-                     label = state.enterTimeInput.ifEmpty { stringResource(R.string.enter_your_entry_time_hh_mm) },
-                     dateButtonType = DateButtonType.TIME,
-                     onClick = { showEnterTimePickerDialog = true },
-                 )
-
-                 Spacer(modifier = Modifier.height(8.dp))
-
-                 DateButton(
-                     label = state.exitTimeInput.ifEmpty { stringResource(R.string.enter_your_exit_time_optional) },
-                     dateButtonType = DateButtonType.TIME,
-                     onClick = { showExitTimePickerDialog = true }
-                 )
-
-                 Spacer(modifier = Modifier.height(16.dp))*/
-
-                /*      FloatingActionButton(
-                         onClick = { viewModel.onFabClicked() },
-                         modifier = Modifier
-                             //  .align(Alignment.BottomEnd)
-                             .padding(16.dp)
-                     ) {
-                         Icon(
-                             imageVector = Icons.Default.Info,
-                             contentDescription = stringResource(R.string.clear)
-                         )
-                     }
-
-                            Button(
-                                 onClick = { viewModel.clearEntries() },
-                                 modifier = Modifier
-                                     /// .align(Alignment.BottomStart)
-                                     .padding(16.dp)
-                             ) {
-                                 Text(
-                                     text = stringResource(R.string.clear),
-                                     fontFamily = FontFamily(Font(R.font.iran_sans_mobile_fa_num)),
-                                 )
-                             }
-             */
             }
         }
     }
@@ -283,7 +241,7 @@ fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
             onConfirm = { timePickerState ->
                 onTimeConfirm(
                     timePickerState,
-                    viewModel::onEnterTimeChange
+                    { onEvent(ExitTimeCalculatorEvent.OnEnterTimeChange(it)) }
                 ) { showEnterTimePickerDialog = it }
             },
             onDismiss = { showEnterTimePickerDialog = false }
@@ -295,7 +253,7 @@ fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
             onConfirm = { timePickerState ->
                 onTimeConfirm(
                     timePickerState,
-                    viewModel::onExitTimeChange
+                    { onEvent(ExitTimeCalculatorEvent.OnExitTimeChange(it)) }
                 ) { showExitTimePickerDialog = it }
             },
             onDismiss = { showExitTimePickerDialog = false }
@@ -304,10 +262,10 @@ fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
 
     if (isBottomSheetVisible) {
         ModalBottomSheet(
-            onDismissRequest = { viewModel.closeBottomSheet() },
+            onDismissRequest = { isBottomSheetVisible = false },
             sheetState = bottomSheetState
         ) {
-            CalculateRemainedDaysOff(onDismiss = { viewModel.closeBottomSheet() })
+            CalculateRemainedDaysOff(onDismiss = { isBottomSheetVisible = false })
         }
     }
 }
@@ -316,6 +274,9 @@ fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
 @Composable
 fun PreviewExitTimeCalc(modifier: Modifier = Modifier) {
     KhoroojYarTheme {
-        ExitTimeCalculatorScreen()
+        ExitTimeCalcContent(
+            state = ExitTimeState(),
+            onEvent = {}
+        )
     }
 }

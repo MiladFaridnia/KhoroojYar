@@ -24,46 +24,42 @@ class ExitTimeViewModel : ViewModel() {
 
     private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
     private val workDuration = Duration.ofMinutes(525) // 8 hours and 45 minutes
-    private val earliestStart = LocalTime.of(8, 0)
+    private val earliestStart = LocalTime.of(7, 0)
     private val latestStart = LocalTime.of(9, 0)
     private val latestEnd = LocalTime.of(17, 45)
 
-    private val _uiEventChannel = Channel<UiEvent>(Channel.BUFFERED)
-    val uiEvents: Flow<UiEvent> = _uiEventChannel.receiveAsFlow()
-
-    fun onFabClicked() {
-        sendUiEvent(UiEvent.ShowBottomSheet)
-    }
-
-    fun closeBottomSheet() {
-        sendUiEvent(UiEvent.HideBottomSheet)
-    }
-
-    private fun sendUiEvent(event: UiEvent) {
-        _uiEventChannel.trySend(event)
-    }
-
-    fun onEnterTimeChange(newTime: String) {
-        _state.update { currentState ->
-            currentState.copy(enterTimeInput = newTime)
+    fun onEvent(event: ExitTimeCalculatorEvent) {
+        when (event) {
+            is ExitTimeCalculatorEvent.OnEnterTimeChange -> {
+                var newEnterTime = LocalTime.parse(event.time, timeFormatter)
+                if (newEnterTime.isBefore(earliestStart)) {
+                    newEnterTime = earliestStart
+                }
+                _state.update { currentState ->
+                    currentState.copy(
+                        enterTime = newEnterTime,
+                        enterTimeInput = event.time
+                    )
+                }
+                calculateTime()
+            }
+            is ExitTimeCalculatorEvent.OnExitTimeChange -> {
+                _state.update { currentState ->
+                    currentState.copy(exitTimeInput = event.time)
+                }
+                calculateTime()
+            }
         }
-        calculateTime()
-    }
-
-    fun onExitTimeChange(newTime: String) {
-        _state.update { currentState ->
-            currentState.copy(exitTimeInput = newTime)
-        }
-        calculateTime()
     }
 
     private fun calculateTime() {
         try {
-            val enterTime = LocalTime.parse(_state.value.enterTimeInput, timeFormatter)
-            if (_state.value.isExitTimeEntered()) {
-                handleExitTimeProvided(enterTime)
-            } else {
-                handleNoExitTime(enterTime)
+            state.value.enterTime?.let { enterTime ->
+                if (_state.value.isExitTimeEntered()) {
+                    handleExitTimeProvided(enterTime)
+                } else {
+                    handleNoExitTime(enterTime)
+                }
             }
         } catch (e: DateTimeParseException) {
             handleInvalidTimeFormat()
@@ -79,33 +75,45 @@ class ExitTimeViewModel : ViewModel() {
             showSnackbar("Exit time cannot be before enter time")
         } else {
             val lateEntryTimeOff = calculateLateEntryTimeOff(enterTime)
-            val overtime = calculateOvertime(exitTimeProvided)
+            val overtime = calculateOvertime(enterTime, exitTimeProvided)
 
             calculateVacation(enterTime, exitTimeProvided)
-            updateTotalTimeSpent(enterTime, exitTimeProvided, lateEntryTimeOff, overtime)
+            updateTotalTimeSpent(enterTime, exitTimeProvided, overtime)
         }
     }
 
     private fun calculateLateEntryTimeOff(enterTime: LocalTime): Duration {
-        val standardStartTime = LocalTime.of(9, 0)
-        return if (enterTime.isAfter(standardStartTime)) {
-            Duration.between(standardStartTime, enterTime)
+        return if (enterTime.isAfter(latestStart)) {
+            Duration.between(latestStart, enterTime)
         } else {
             Duration.ZERO
         }
     }
 
-    private fun calculateOvertime(exitTime: LocalTime): Duration {
+    private fun calculateOvertime(enterTime: LocalTime, exitTime: LocalTime): Duration {
+        var overtime = Duration.ZERO
         val standardEndTime = LocalTime.of(17, 45)
-        return if (exitTime.isAfter(standardEndTime)) {
-            Duration.between(standardEndTime, exitTime)
-        } else {
-            Duration.ZERO
+
+        // Calculate overtime for working past the standard end time
+        if (exitTime.isAfter(standardEndTime)) {
+            overtime = overtime.plus(Duration.between(standardEndTime, exitTime))
         }
+
+        // Calculate early entry overtime (if entered between earliestStart and latestStart)
+        if (enterTime.isAfter(earliestStart) && enterTime.isBefore(latestStart)) {
+            val earlyEntryDuration = Duration.between(enterTime, latestStart)
+            val totalWorkDuration = Duration.between(enterTime, exitTime)
+
+            if (totalWorkDuration > workDuration) {
+                overtime = overtime.plus(earlyEntryDuration)
+            }
+        }
+
+        return overtime
     }
 
     private fun handleNoExitTime(enterTime: LocalTime) {
-        if (enterTime.isAfter(LocalTime.of(9, 0))) {
+        if (enterTime.isAfter(latestStart)) {
             updateLateStartState(enterTime)
         } else {
             _state.update { currentState ->
@@ -122,7 +130,6 @@ class ExitTimeViewModel : ViewModel() {
     private fun updateTotalTimeSpent(
         enterTime: LocalTime,
         exitTime: LocalTime,
-        lateEntryTimeOff: Duration,
         overtime: Duration
     ) {
         val totalTimeWorked = Duration.between(enterTime, exitTime)
@@ -191,27 +198,10 @@ class ExitTimeViewModel : ViewModel() {
 
     private fun calculateAndUpdateDefaultExitTime(enterTime: LocalTime) {
         val exitTimeCalculated = enterTime.plusHours(8).plusMinutes(45)
-        val totalTimeWorked = Duration.between(enterTime, exitTimeCalculated)
-        val totalTimeWorkedHours = totalTimeWorked.toHours().toInt()
-        val totalTimeWorkedMinutes = (totalTimeWorked.toMinutes() % 60).toInt()
-
-        val timeWorkedDuration = String.format(
-            Locale.US,
-            "%02d:%02d",
-            totalTimeWorkedHours,
-            totalTimeWorkedMinutes
-        )
-
-        val timeWorkedSegment = TimeSegment(
-            startTime = enterTime.toString(),
-            endTime = exitTimeCalculated.toString(),
-            duration = timeWorkedDuration
-        )
 
         _state.update { currentState ->
             currentState.copy(
-                exitTime = exitTimeCalculated.format(timeFormatter),
-                timeWorked = timeWorkedSegment
+                exitTime = exitTimeCalculated.format(timeFormatter)
             )
         }
     }
@@ -302,11 +292,5 @@ class ExitTimeViewModel : ViewModel() {
             overtime = null,
             vacationList = emptyList()
         )
-    }
-
-
-    sealed class UiEvent {
-        data object ShowBottomSheet : UiEvent()
-        data object HideBottomSheet : UiEvent()
     }
 }
