@@ -4,11 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarController
 import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarEvent
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Duration
@@ -48,6 +45,14 @@ class ExitTimeViewModel : ViewModel() {
                     currentState.copy(exitTimeInput = event.time)
                 }
                 calculateTime()
+            }
+
+            is ExitTimeCalculatorEvent.OnEnterTimeSave -> {
+
+            }
+
+            is ExitTimeCalculatorEvent.OnExitTimeSave -> {
+
             }
         }
     }

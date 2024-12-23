@@ -116,18 +116,15 @@ fun KhoroojYarTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val view = LocalView.current
-    val window = (view.context as Activity).window
 
-    window.statusBarColor = colorScheme.background.toArgb()
-    window.navigationBarColor = colorScheme.background.toArgb()
+    ChangeStatusBarColor(colorScheme, colorScheme)
 
     val colorScheme = when {
 
-    /* dynamicColor -> {
-                    val context = LocalContext.current
-                     if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-    }*/
+        /* dynamicColor -> {
+                        val context = LocalContext.current
+                         if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }*/
 
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
@@ -138,4 +135,17 @@ fun KhoroojYarTheme(
         typography = Typography,
         content = content
     )
+}
+
+@Composable
+private fun ChangeStatusBarColor(
+    colorScheme: ColorScheme,
+    colorScheme0: ColorScheme
+) {
+    val view = LocalView.current
+    if (view.context is Activity) {
+        val window = (view.context as Activity).window
+        window.statusBarColor = colorScheme.background.toArgb()
+        window.navigationBarColor = colorScheme0.background.toArgb()
+    }
 }
