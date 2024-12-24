@@ -92,7 +92,7 @@ fun ExitTimeCalcContent(
     val onTimeConfirm: (TimePickerState, (String) -> Unit, (Boolean) -> Unit) -> Unit =
         { timePickerState, onTimeChange, closeDialog ->
             val selectedTime =
-                extractTime(timePickerState)
+                extractTime(timePickerState.hour, timePickerState.minute)
             onTimeChange(selectedTime)
             closeDialog(false)
         }
@@ -136,8 +136,8 @@ fun ExitTimeCalcContent(
                     Modifier
                         .wrapContentSize()
                         .padding(horizontal = 16.dp),
-                    enterLabel = state.enterTimeInput.ifEmpty { stringResource(R.string.enter_your_entry_time_hh_mm) },
-                    exitLabel = state.exitTimeInput.ifEmpty { stringResource(R.string.enter_your_exit_time_optional) },
+                    enterLabel = state.enterTime.toFormattedString(),
+                    exitLabel = state.exitTime.toFormattedString(),
                     enterOnClick = { showEnterTimePickerDialog = true },
                     exitOnClick = { showExitTimePickerDialog = true }
                 )
@@ -193,11 +193,11 @@ fun ExitTimeCalcContent(
                         }
                     }
 
-                    state.exitTime.takeIf { it.isNotEmpty() }?.let { exitTime ->
+                    state.exitTime?.let { exitTime ->
                         item {
                             WorkingHourItem(
                                 title = stringResource(R.string.exit_time),
-                                timeDuration = exitTime,
+                                timeDuration = exitTime.toFormattedString(),
                                 iconId = R.drawable.ic_exiting_employee
                             )
                         }
@@ -288,10 +288,9 @@ fun ExitTimeCalcContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-private fun extractTime(timePickerState: TimePickerState): String {
+private fun extractTime(hour: Int, minute: Int): String {
     val selectedTime =
-        String.format(Locale.US, "%02d:%02d", timePickerState.hour, timePickerState.minute)
+        String.format(Locale.US, "%02d:%02d", hour, minute)
     return selectedTime
 }
 
