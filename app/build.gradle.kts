@@ -4,12 +4,13 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    id ("kotlin-kapt")
 
 }
 
 android {
     val versionMajor = 1
-    val versionMinor = 23
+    val versionMinor = 24
     val versionPatch = 0
     val appName = "KhoroojYar"
     val appVersionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
@@ -73,6 +74,10 @@ android {
     buildFeatures {
         compose = true
     }
+    // Allow references to generated code
+    kapt {
+        correctErrorTypes  = true
+    }
 }
 
 dependencies {
@@ -113,9 +118,9 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
 
     // Dependency Injection
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
-    ksp(libs.androidx.hilt.compiler)
+    implementation (libs.hilt.android)
+    kapt(libs.dagger.hilt.compiler)
+    implementation (libs.androidx.hilt.navigation.compose)
 
     //Room
     implementation(libs.androidx.room.runtime)

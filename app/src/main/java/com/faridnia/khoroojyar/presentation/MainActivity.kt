@@ -6,7 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 import com.jrg.app.ui.component.snackbar.CustomScaffold
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

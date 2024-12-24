@@ -1,17 +1,6 @@
 package com.faridnia.khoroojyar.di
 
-import com.faridnia.khoroojyar.domain.repository.WorkDayInfoRepository
-import com.faridnia.khoroojyar.domain.use_case.db.DeleteWorkDayInfoUseCase
-import com.faridnia.khoroojyar.domain.use_case.db.GetAllWorkDayInfosUseCase
-import com.faridnia.khoroojyar.domain.use_case.db.GetWorkDayInfoByDayUseCase
-import com.faridnia.khoroojyar.domain.use_case.db.GetWorkDayInfoByIdUseCase
-import com.faridnia.khoroojyar.domain.use_case.db.InsertWorkDayInfoUseCase
-import com.faridnia.khoroojyar.domain.use_case.db.UpdateWorkDayInfoUseCase
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+/*
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -52,4 +41,11 @@ object UseCaseModule {
     fun provideGetWorkDayInfoByDayUseCase(repository: WorkDayInfoRepository): GetWorkDayInfoByDayUseCase {
         return GetWorkDayInfoByDayUseCase(repository)
     }
+
+    @Singleton
+    @Provides
+    fun provideUpsertWorkDayInfoUseCase(repository: WorkDayInfoRepository): UpsertWorkDayInfoUseCase {
+        return UpsertWorkDayInfoUseCase(repository)
+    }
 }
+*/

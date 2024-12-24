@@ -33,8 +33,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.faridnia.khoroojyar.R
 import com.faridnia.khoroojyar.presentation.calculate_days_off.CalculateRemainedDaysOff
 import com.faridnia.khoroojyar.presentation.component.CustomBox
@@ -54,7 +54,7 @@ import com.razaghimahdi.compose_persian_date.core.PersianDatePickerController
 import java.util.Locale
 
 @Composable
-fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = viewModel()) {
+fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     ExitTimeCalcContent(
@@ -238,31 +238,40 @@ fun ExitTimeCalcContent(
 
     if (showEnterTimePickerDialog) {
         TimePickerDialog(
-            onConfirm = { timePickerState ->
+            onConfirm = { isChecked, timePickerState ->
                 onTimeConfirm(
                     timePickerState,
                     { onEvent(ExitTimeCalculatorEvent.OnEnterTimeChange(it)) }
                 ) { showEnterTimePickerDialog = it }
-            },
-            onCheckChange = { isChecked, timePickerState ->
+
                 onEvent(
                     ExitTimeCalculatorEvent.OnEnterTimeSave(
                         isChecked,
-                        extractTime(timePickerState)
+                        timePickerState.hour,
+                        timePickerState.minute
                     )
                 )
             },
+            onCheckChange = { _, _ -> },
             onDismiss = { showEnterTimePickerDialog = false }
         )
     }
 
     if (showExitTimePickerDialog) {
         TimePickerDialog(
-            onConfirm = { timePickerState ->
+            onConfirm = { isChecked, timePickerState ->
                 onTimeConfirm(
                     timePickerState,
                     { onEvent(ExitTimeCalculatorEvent.OnExitTimeChange(it)) }
                 ) { showExitTimePickerDialog = it }
+
+                onEvent(
+                    ExitTimeCalculatorEvent.OnExitTimeSave(
+                        isChecked,
+                        timePickerState.hour,
+                        timePickerState.minute
+                    )
+                )
             },
             onCheckChange = { _, _ -> },
             onDismiss = { showExitTimePickerDialog = false }
