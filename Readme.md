@@ -1,4 +1,6 @@
 # KhoroojYar
+![Dark Theme](https://github.com/user-attachments/assets/2455d008-94f2-43e2-87f6-78086119bdc2)
+![Light Theme](https://github.com/user-attachments/assets/2264e76c-ff30-4cb3-82ed-6ea53699dfeb)
 
 KhoroojYar is a simple HR tool developed for calculating the enter and exit times, as well as the time off for employees. This application utilizes Jetpack Compose for its user interface and integrates various libraries to enhance functionality.
 
