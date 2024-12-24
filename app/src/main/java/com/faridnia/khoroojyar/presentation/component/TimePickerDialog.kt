@@ -1,12 +1,15 @@
 package com.faridnia.khoroojyar.presentation.component
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -16,6 +19,10 @@ import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -30,6 +37,7 @@ import java.util.Calendar
 @Composable
 fun TimePickerDialog(
     onConfirm: (TimePickerState) -> Unit,
+    onCheckChange: (Boolean, TimePickerState) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val currentTime = Calendar.getInstance()
@@ -39,6 +47,8 @@ fun TimePickerDialog(
         initialMinute = currentTime.get(Calendar.MINUTE),
         is24Hour = true,
     )
+
+    var isSaveTime by remember { mutableStateOf(true) }
 
     BasicAlertDialog(onDismissRequest = onDismiss, modifier = Modifier.fillMaxWidth()) {
         ElevatedCard(
@@ -63,6 +73,23 @@ fun TimePickerDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = isSaveTime,
+                        onCheckedChange = { isChecked ->
+                            isSaveTime = isChecked
+                            onCheckChange(isChecked, timePickerState)
+                        })
+                    CustomText(
+                        text = stringResource(R.string.save),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { onConfirm(timePickerState) }) {
@@ -81,6 +108,10 @@ fun TimePickerDialog(
 @Composable
 private fun TimePickerDialogPreview() {
     KhoroojYarTheme {
-        TimePickerDialog(onConfirm = {}) { }
+        TimePickerDialog(
+            onConfirm = {},
+            onCheckChange = { _, _ -> },
+            onDismiss = {}
+        )
     }
 }

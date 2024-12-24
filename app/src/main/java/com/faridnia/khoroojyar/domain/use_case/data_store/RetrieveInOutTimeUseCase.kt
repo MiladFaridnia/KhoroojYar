@@ -1,6 +1,6 @@
-package com.faridnia.khoroojyar.domain.use_case
+package com.faridnia.khoroojyar.domain.use_case.data_store
 
-import com.faridnia.khoroojyar.domain.data_store.PreferencesRepository
+import com.faridnia.khoroojyar.domain.repository.PreferencesRepository
 import kotlinx.coroutines.flow.Flow
 
 class RetrieveInOutTimeUseCase(private val repository: PreferencesRepository) {

@@ -92,7 +92,7 @@ fun ExitTimeCalcContent(
     val onTimeConfirm: (TimePickerState, (String) -> Unit, (Boolean) -> Unit) -> Unit =
         { timePickerState, onTimeChange, closeDialog ->
             val selectedTime =
-                String.format(Locale.US, "%02d:%02d", timePickerState.hour, timePickerState.minute)
+                extractTime(timePickerState)
             onTimeChange(selectedTime)
             closeDialog(false)
         }
@@ -244,6 +244,14 @@ fun ExitTimeCalcContent(
                     { onEvent(ExitTimeCalculatorEvent.OnEnterTimeChange(it)) }
                 ) { showEnterTimePickerDialog = it }
             },
+            onCheckChange = { isChecked, timePickerState ->
+                onEvent(
+                    ExitTimeCalculatorEvent.OnEnterTimeSave(
+                        isChecked,
+                        extractTime(timePickerState)
+                    )
+                )
+            },
             onDismiss = { showEnterTimePickerDialog = false }
         )
     }
@@ -256,6 +264,7 @@ fun ExitTimeCalcContent(
                     { onEvent(ExitTimeCalculatorEvent.OnExitTimeChange(it)) }
                 ) { showExitTimePickerDialog = it }
             },
+            onCheckChange = { _, _ -> },
             onDismiss = { showExitTimePickerDialog = false }
         )
     }
@@ -268,6 +277,13 @@ fun ExitTimeCalcContent(
             CalculateRemainedDaysOff(onDismiss = { isBottomSheetVisible = false })
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+private fun extractTime(timePickerState: TimePickerState): String {
+    val selectedTime =
+        String.format(Locale.US, "%02d:%02d", timePickerState.hour, timePickerState.minute)
+    return selectedTime
 }
 
 @LightAndDarkPreview

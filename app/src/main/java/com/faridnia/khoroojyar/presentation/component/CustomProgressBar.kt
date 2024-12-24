@@ -63,7 +63,7 @@ fun CustomProgressBar(
             // Amount text
             Text(
                 text = amount,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = Ocean_Blue,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(end = 8.dp)
             )

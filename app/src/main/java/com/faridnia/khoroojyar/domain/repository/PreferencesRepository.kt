@@ -1,4 +1,4 @@
-package com.faridnia.khoroojyar.domain.data_store
+package com.faridnia.khoroojyar.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 
