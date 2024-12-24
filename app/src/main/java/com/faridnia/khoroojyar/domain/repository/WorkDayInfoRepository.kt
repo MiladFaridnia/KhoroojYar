@@ -7,6 +7,20 @@ import javax.inject.Inject
 
 class WorkDayInfoRepository @Inject constructor(private val dao: WorkDayInfoDao) {
 
+    suspend fun upsertWorkDayInfo(workDayInfo: WorkDayInfo) {
+        val insertResult = dao.insert(workDayInfo)
+        if (insertResult == -1L) {
+            // Conflict occurred, update specific fields
+            dao.updateFieldsByDay(
+                day = workDayInfo.day,
+                firstEnterTime = workDayInfo.firstEnterTime,
+                firstExitTime = workDayInfo.firstExitTime,
+                secondEnterTime = workDayInfo.secondEnterTime,
+                secondExitTime = workDayInfo.secondExitTime
+            )
+        }
+    }
+
     suspend fun insert(workDayInfo: WorkDayInfo) {
         dao.insert(workDayInfo)
     }

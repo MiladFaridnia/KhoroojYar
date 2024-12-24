@@ -2,19 +2,27 @@ package com.faridnia.khoroojyar.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.faridnia.khoroojyar.data.room.WorkDayInfo
+import com.faridnia.khoroojyar.domain.use_case.db.UpsertWorkDayInfoUseCase
 import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarController
 import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Duration
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.Locale
+import javax.inject.Inject
 
-class ExitTimeViewModel : ViewModel() {
+@HiltViewModel
+class ExitTimeViewModel @Inject constructor(
+    private val upsertWorkDayInfoUseCase: UpsertWorkDayInfoUseCase
+) : ViewModel() {
 
     private val _state = MutableStateFlow(ExitTimeState())
     val state = _state.asStateFlow()
@@ -40,6 +48,7 @@ class ExitTimeViewModel : ViewModel() {
                 }
                 calculateTime()
             }
+
             is ExitTimeCalculatorEvent.OnExitTimeChange -> {
                 _state.update { currentState ->
                     currentState.copy(exitTimeInput = event.time)
@@ -48,13 +57,61 @@ class ExitTimeViewModel : ViewModel() {
             }
 
             is ExitTimeCalculatorEvent.OnEnterTimeSave -> {
-
+                if (event.isChecked) {
+                    val newEnterTimeWorkDayInfo =
+                        createWorkDayInfoWithEnterTime(event.hour, event.minute)
+                    saveWorkDayInfo(newEnterTimeWorkDayInfo)
+                }
             }
 
             is ExitTimeCalculatorEvent.OnExitTimeSave -> {
-
+                if (event.isChecked) {
+                    val newExitTimeWorkDayInfo =
+                        createWorkDayInfoWithExitTime(event.hour, event.minute)
+                    saveWorkDayInfo(newExitTimeWorkDayInfo)
+                }
             }
         }
+    }
+
+    private fun saveWorkDayInfo(workDayInfo: WorkDayInfo) {
+        viewModelScope.launch {
+            upsertWorkDayInfoUseCase(workDayInfo)
+        }
+    }
+
+    private fun createWorkDayInfoWithEnterTime(
+        hour: Int,
+        minute: Int
+    ): WorkDayInfo {
+        val today = LocalDate.now()
+        val selectedTime = LocalTime.of(hour, minute)
+        val newWorkDayInfo = WorkDayInfo(
+            id = 0,
+            day = today,
+            firstEnterTime = selectedTime,
+            firstExitTime = null,
+            secondEnterTime = null,
+            secondExitTime = null
+        )
+        return newWorkDayInfo
+    }
+
+    private fun createWorkDayInfoWithExitTime(
+        hour: Int,
+        minute: Int
+    ): WorkDayInfo {
+        val today = LocalDate.now()
+        val selectedTime = LocalTime.of(hour, minute)
+        val newWorkDayInfo = WorkDayInfo(
+            id = 0,
+            day = today,
+            firstEnterTime = null,
+            firstExitTime = selectedTime,
+            secondEnterTime = null,
+            secondExitTime = null
+        )
+        return newWorkDayInfo
     }
 
     private fun calculateTime() {
@@ -160,7 +217,8 @@ class ExitTimeViewModel : ViewModel() {
 
             TimeSegment(
                 startTime = exitTime.toString(),
-                endTime = exitTime.plusHours(overtimeHours.toLong()).plusMinutes(overtimeMinutes.toLong()).toString(),
+                endTime = exitTime.plusHours(overtimeHours.toLong())
+                    .plusMinutes(overtimeMinutes.toLong()).toString(),
                 duration = String.format(
                     Locale.US,
                     "%02d:%02d",
@@ -288,7 +346,7 @@ class ExitTimeViewModel : ViewModel() {
         }
     }
 
-    fun clearEntries() {
+    private fun clearEntries() {
         _state.value = _state.value.copy(
             enterTimeInput = "",
             exitTimeInput = "",

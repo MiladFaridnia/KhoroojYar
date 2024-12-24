@@ -36,7 +36,7 @@ import java.util.Calendar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePickerDialog(
-    onConfirm: (TimePickerState) -> Unit,
+    onConfirm: (Boolean, TimePickerState) -> Unit,
     onCheckChange: (Boolean, TimePickerState) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -92,7 +92,7 @@ fun TimePickerDialog(
 
                 Button(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { onConfirm(timePickerState) }) {
+                    onClick = { onConfirm(isSaveTime, timePickerState) }) {
                     Text(
                         text = stringResource(R.string.confirm),
                         fontFamily = FontFamily(Font(R.font.iran_sans_mobile_fa_num)),
@@ -109,7 +109,7 @@ fun TimePickerDialog(
 private fun TimePickerDialogPreview() {
     KhoroojYarTheme {
         TimePickerDialog(
-            onConfirm = {},
+            onConfirm = { _, _ -> },
             onCheckChange = { _, _ -> },
             onDismiss = {}
         )
