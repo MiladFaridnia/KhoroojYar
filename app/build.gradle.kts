@@ -2,12 +2,14 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 
 }
 
 android {
     val versionMajor = 1
-    val versionMinor = 21
+    val versionMinor = 22
     val versionPatch = 0
     val appName = "KhoroojYar"
     val appVersionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
@@ -111,9 +113,15 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
 
     // Dependency Injection
-    implementation (libs.hilt.android)
-    annotationProcessor(libs.hilt.android.compiler)
-//    kapt(libs.hilt.android.compiler)
-    implementation (libs.androidx.hilt.navigation.compose)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    ksp(libs.androidx.hilt.compiler)
+
+    //Room
+    implementation(libs.androidx.room.runtime)
+    // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
+    ksp(libs.androidx.room.compiler)
+    //Kotlin Extensions and Coroutines support for Room
+    implementation(libs.androidx.room.ktx)
 
 }

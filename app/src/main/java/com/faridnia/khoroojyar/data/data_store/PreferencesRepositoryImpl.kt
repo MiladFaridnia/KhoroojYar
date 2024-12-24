@@ -1,6 +1,6 @@
 package com.faridnia.khoroojyar.data.data_store
 
-import com.faridnia.khoroojyar.domain.data_store.PreferencesRepository
+import com.faridnia.khoroojyar.domain.repository.PreferencesRepository
 import kotlinx.coroutines.flow.Flow
 
 // Repository Implementation (Data Layer)
