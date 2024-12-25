@@ -3,12 +3,16 @@ package com.faridnia.khoroojyar.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.faridnia.khoroojyar.data.room.WorkDayInfo
+import com.faridnia.khoroojyar.domain.use_case.db.GetWorkDayInfoByDayUseCase
 import com.faridnia.khoroojyar.domain.use_case.db.UpsertWorkDayInfoUseCase
 import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarController
 import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Duration
@@ -21,11 +25,38 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ExitTimeViewModel @Inject constructor(
-    private val upsertWorkDayInfoUseCase: UpsertWorkDayInfoUseCase
+    private val upsertWorkDayInfoUseCase: UpsertWorkDayInfoUseCase,
+    private val getWorkDayInfo: GetWorkDayInfoByDayUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ExitTimeState())
     val state = _state.asStateFlow()
+        .onStart {
+            getInitialWorkDayInfo(LocalDate.now())
+        }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000L),
+            ExitTimeState()
+        )
+
+    private fun getInitialWorkDayInfo(now: LocalDate) {
+        viewModelScope.launch {
+            val workDayInfo = getWorkDayInfo(now)
+            val overTime = calculateOvertime(workDayInfo?.firstEnterTime?: LocalTime.MIN, workDayInfo?.firstExitTime?: LocalTime.MIN)
+            val timeWorkedSegment = getTotalTimeWorkInSegment(workDayInfo?.firstEnterTime?: LocalTime.MIN, workDayInfo?.firstExitTime?: LocalTime.MIN)
+
+            _state.update { currentState ->
+                currentState.copy(
+                    enterTime = workDayInfo?.firstEnterTime,
+                    exitTime = workDayInfo?.firstExitTime,
+                    vacationList = emptyList(),//FIXME
+                    timeWorked = timeWorkedSegment,//FIXME
+                    overtime = overTimeToTimeSegment(overTime, workDayInfo?.firstExitTime?: LocalTime.MIN) //FIXME must change with CalculateOvertimeUseCase
+                )
+            }
+        }
+    }
 
     private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
     private val workDuration = Duration.ofMinutes(525) // 8 hours and 45 minutes
@@ -42,17 +73,20 @@ class ExitTimeViewModel @Inject constructor(
                 }
                 _state.update { currentState ->
                     currentState.copy(
-                        enterTime = newEnterTime,
-                        enterTimeInput = event.time
+                        enterTime = newEnterTime
                     )
                 }
                 calculateTime()
             }
 
             is ExitTimeCalculatorEvent.OnExitTimeChange -> {
+                val newEnterTime = LocalTime.parse(event.time, timeFormatter)
                 _state.update { currentState ->
-                    currentState.copy(exitTimeInput = event.time)
+                    currentState.copy(
+                        exitTime = newEnterTime
+                    )
                 }
+
                 calculateTime()
             }
 
@@ -118,7 +152,7 @@ class ExitTimeViewModel @Inject constructor(
         try {
             state.value.enterTime?.let { enterTime ->
                 if (_state.value.isExitTimeEntered()) {
-                    handleExitTimeProvided(enterTime)
+                    handleExitTimeProvided(enterTime, _state.value.exitTime!!)
                 } else {
                     handleNoExitTime(enterTime)
                 }
@@ -130,8 +164,7 @@ class ExitTimeViewModel @Inject constructor(
         }
     }
 
-    private fun handleExitTimeProvided(enterTime: LocalTime) {
-        val exitTimeProvided = LocalTime.parse(_state.value.exitTimeInput, timeFormatter)
+    private fun handleExitTimeProvided(enterTime: LocalTime, exitTimeProvided: LocalTime) {
 
         if (exitTimeProvided.isBefore(enterTime)) {
             showSnackbar("Exit time cannot be before enter time")
@@ -194,6 +227,23 @@ class ExitTimeViewModel @Inject constructor(
         exitTime: LocalTime,
         overtime: Duration
     ) {
+        val timeWorkedSegment = getTotalTimeWorkInSegment(enterTime, exitTime)
+
+        val overtimeSegment = overTimeToTimeSegment(overtime, exitTime)
+
+        _state.update { currentState ->
+            currentState.copy(
+                exitTime = null,
+                timeWorked = timeWorkedSegment,
+                overtime = overtimeSegment
+            )
+        }
+    }
+
+    private fun getTotalTimeWorkInSegment(
+        enterTime: LocalTime,
+        exitTime: LocalTime
+    ): TimeSegment {
         val totalTimeWorked = Duration.between(enterTime, exitTime)
         val totalTimeWorkedHours = totalTimeWorked.toHours().toInt()
         val totalTimeWorkedMinutes = (totalTimeWorked.toMinutes() % 60).toInt()
@@ -210,7 +260,13 @@ class ExitTimeViewModel @Inject constructor(
             endTime = exitTime.toString(),
             duration = timeWorkedDuration
         )
+        return timeWorkedSegment
+    }
 
+    private fun overTimeToTimeSegment(
+        overtime: Duration,
+        exitTime: LocalTime
+    ): TimeSegment? {
         val overtimeSegment = if (!overtime.isZero) {
             val overtimeHours = overtime.toHours().toInt()
             val overtimeMinutes = (overtime.toMinutes() % 60).toInt()
@@ -229,14 +285,7 @@ class ExitTimeViewModel @Inject constructor(
         } else {
             null
         }
-
-        _state.update { currentState ->
-            currentState.copy(
-                exitTime = "",
-                timeWorked = timeWorkedSegment,
-                overtime = overtimeSegment
-            )
-        }
+        return overtimeSegment
     }
 
     private fun updateLateStartState(enterTime: LocalTime) {
@@ -245,7 +294,7 @@ class ExitTimeViewModel @Inject constructor(
 
         _state.update { currentState ->
             currentState.copy(
-                exitTime = "17:45",
+                exitTime = LocalTime.of(17, 45),
                 timeWorked = null,
                 overtime = null,
                 vacationList = listOf(
@@ -264,7 +313,7 @@ class ExitTimeViewModel @Inject constructor(
 
         _state.update { currentState ->
             currentState.copy(
-                exitTime = exitTimeCalculated.format(timeFormatter)
+                exitTime = exitTimeCalculated
             )
         }
     }
@@ -272,7 +321,7 @@ class ExitTimeViewModel @Inject constructor(
     private fun handleInvalidTimeFormat() {
         _state.update { currentState ->
             currentState.copy(
-                exitTime = "Invalid time format",
+                exitTime = null,
                 timeWorked = null,
                 overtime = null,
                 vacationList = emptyList()
@@ -284,7 +333,7 @@ class ExitTimeViewModel @Inject constructor(
     private fun handleInvalidExitTime() {
         _state.update { currentState ->
             currentState.copy(
-                exitTime = "Invalid exit time",
+                exitTime = null,
                 timeWorked = null,
                 overtime = null,
             )
@@ -346,14 +395,4 @@ class ExitTimeViewModel @Inject constructor(
         }
     }
 
-    private fun clearEntries() {
-        _state.value = _state.value.copy(
-            enterTimeInput = "",
-            exitTimeInput = "",
-            exitTime = "",
-            timeWorked = null,
-            overtime = null,
-            vacationList = emptyList()
-        )
-    }
 }
