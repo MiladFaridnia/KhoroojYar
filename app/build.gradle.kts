@@ -4,14 +4,14 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
-    id ("kotlin-kapt")
-
+    id("kotlin-kapt")
+    kotlin("plugin.serialization") version "2.1.0"
 }
 
 android {
     val versionMajor = 1
     val versionMinor = 24
-    val versionPatch = 2
+    val versionPatch = 3
     val appName = "KhoroojYar"
     val appVersionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
     val appVersionName = "$versionMajor.$versionMinor.$versionPatch"
@@ -76,7 +76,7 @@ android {
     }
     // Allow references to generated code
     kapt {
-        correctErrorTypes  = true
+        correctErrorTypes = true
     }
 }
 
@@ -118,9 +118,9 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
 
     // Dependency Injection
-    implementation (libs.hilt.android)
+    implementation(libs.hilt.android)
     kapt(libs.dagger.hilt.compiler)
-    implementation (libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
 
     //Room
     implementation(libs.androidx.room.runtime)
@@ -128,5 +128,5 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     //Kotlin Extensions and Coroutines support for Room
     implementation(libs.androidx.room.ktx)
-
+    implementation(libs.kotlinx.serialization)
 }

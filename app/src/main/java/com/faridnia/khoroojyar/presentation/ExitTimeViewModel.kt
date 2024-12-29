@@ -3,106 +3,145 @@ package com.faridnia.khoroojyar.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.faridnia.khoroojyar.data.room.WorkDayInfo
+import com.faridnia.khoroojyar.domain.use_case.CalculateExitTimeUseCase
+import com.faridnia.khoroojyar.domain.use_case.CalculateOvertimeUseCase
+import com.faridnia.khoroojyar.domain.use_case.CalculateTimeOffUseCase
 import com.faridnia.khoroojyar.domain.use_case.db.GetWorkDayInfoByDayUseCase
 import com.faridnia.khoroojyar.domain.use_case.db.UpsertWorkDayInfoUseCase
 import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarController
 import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarEvent
+import com.faridnia.khoroojyar.util.toFormattedString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
 class ExitTimeViewModel @Inject constructor(
+    private val calculateExitTimeUseCase: CalculateExitTimeUseCase,
+    private val calculateOvertimeUseCase: CalculateOvertimeUseCase,
+    private val calculateTimeOffUseCase: CalculateTimeOffUseCase,
     private val upsertWorkDayInfoUseCase: UpsertWorkDayInfoUseCase,
     private val getWorkDayInfo: GetWorkDayInfoByDayUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ExitTimeState())
     val state = _state.asStateFlow()
-        .onStart {
-            getInitialWorkDayInfo(LocalDate.now())
-        }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000L),
-            ExitTimeState()
-        )
+
+    init {
+        getInitialWorkDayInfo(LocalDate.now())
+    }
 
     private fun getInitialWorkDayInfo(now: LocalDate) {
         viewModelScope.launch {
             val workDayInfo = getWorkDayInfo(now)
-            val overTime = calculateOvertime(workDayInfo?.firstEnterTime?: LocalTime.MIN, workDayInfo?.firstExitTime?: LocalTime.MIN)
-            val timeWorkedSegment = getTotalTimeWorkInSegment(workDayInfo?.firstEnterTime?: LocalTime.MIN, workDayInfo?.firstExitTime?: LocalTime.MIN)
-
             _state.update { currentState ->
                 currentState.copy(
                     enterTime = workDayInfo?.firstEnterTime,
-                    exitTime = workDayInfo?.firstExitTime,
-                    vacationList = emptyList(),//FIXME
-                    timeWorked = timeWorkedSegment,//FIXME
-                    overtime = overTimeToTimeSegment(overTime, workDayInfo?.firstExitTime?: LocalTime.MIN) //FIXME must change with CalculateOvertimeUseCase
+                    exitTime = workDayInfo?.firstExitTime
                 )
             }
+        }.invokeOnCompletion {
+            calculateTime()
         }
     }
-
-    private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-    private val workDuration = Duration.ofMinutes(525) // 8 hours and 45 minutes
-    private val earliestStart = LocalTime.of(7, 0)
-    private val latestStart = LocalTime.of(9, 0)
-    private val latestEnd = LocalTime.of(17, 45)
 
     fun onEvent(event: ExitTimeCalculatorEvent) {
         when (event) {
             is ExitTimeCalculatorEvent.OnEnterTimeChange -> {
-                var newEnterTime = LocalTime.parse(event.time, timeFormatter)
-                if (newEnterTime.isBefore(earliestStart)) {
-                    newEnterTime = earliestStart
-                }
-                _state.update { currentState ->
-                    currentState.copy(
-                        enterTime = newEnterTime
-                    )
-                }
-                calculateTime()
+                handleEnterTimeChange(event.time)
             }
 
             is ExitTimeCalculatorEvent.OnExitTimeChange -> {
-                val newEnterTime = LocalTime.parse(event.time, timeFormatter)
-                _state.update { currentState ->
-                    currentState.copy(
-                        exitTime = newEnterTime
-                    )
-                }
-
-                calculateTime()
+                handleExitTimeChange(event.time)
             }
 
             is ExitTimeCalculatorEvent.OnEnterTimeSave -> {
                 if (event.isChecked) {
-                    val newEnterTimeWorkDayInfo =
+                    saveWorkDayInfo(
                         createWorkDayInfoWithEnterTime(event.hour, event.minute)
-                    saveWorkDayInfo(newEnterTimeWorkDayInfo)
+                    )
                 }
             }
 
             is ExitTimeCalculatorEvent.OnExitTimeSave -> {
                 if (event.isChecked) {
-                    val newExitTimeWorkDayInfo =
+                    saveWorkDayInfo(
                         createWorkDayInfoWithExitTime(event.hour, event.minute)
-                    saveWorkDayInfo(newExitTimeWorkDayInfo)
+                    )
+                }
+            }
+        }
+    }
+
+    private fun handleEnterTimeChange(time: String) {
+        try {
+            val newEnterTime = LocalTime.parse(time)
+            _state.update { currentState ->
+                currentState.copy(enterTime = newEnterTime)
+            }
+            calculateTime()
+        } catch (e: Exception) {
+            handleInvalidTimeFormat()
+        }
+    }
+
+    private fun handleExitTimeChange(time: String) {
+        try {
+            val newExitTime = LocalTime.parse(time)
+            _state.update { currentState ->
+                currentState.copy(exitTime = newExitTime)
+            }
+            calculateTime()
+        } catch (e: Exception) {
+            handleInvalidTimeFormat()
+        }
+    }
+
+    private fun calculateTime() {
+        val enterTime = _state.value.enterTime ?: return
+        val exitTime = _state.value.exitTime
+        viewModelScope.launch {
+            val timeOffs = calculateTimeOffUseCase(
+                WorkDayInfo(
+                    day = LocalDate.now(),
+                    firstEnterTime = enterTime,
+                    firstExitTime = exitTime
+                )
+            )
+            if (state.value.isExitTimeEntered()) {
+                val timeWorked = getTotalTimeWorkInSegment(
+                    enterTime = enterTime,
+                    exitTime = exitTime!!
+                )
+                val overtime = calculateOvertimeUseCase(
+                    WorkDayInfo(
+                        day = LocalDate.now(),
+                        firstEnterTime = enterTime,
+                        firstExitTime = exitTime
+                    )
+                )
+                _state.update { currentState ->
+                    currentState.copy(
+                        canExitTime = null,
+                        timeOffList = timeOffs,
+                        timeWorked = timeWorked,
+                        overtime = overTimeToTimeSegment(overtime, exitTime)
+                    )
+                }
+            } else {
+                val calculatedExitTime = calculateExitTimeUseCase(enterTime)
+                _state.update {
+                    it.copy(
+                        timeOffList = timeOffs,
+                        canExitTime = calculatedExitTime
+                    )
                 }
             }
         }
@@ -114,13 +153,10 @@ class ExitTimeViewModel @Inject constructor(
         }
     }
 
-    private fun createWorkDayInfoWithEnterTime(
-        hour: Int,
-        minute: Int
-    ): WorkDayInfo {
+    private fun createWorkDayInfoWithEnterTime(hour: Int, minute: Int): WorkDayInfo {
         val today = LocalDate.now()
         val selectedTime = LocalTime.of(hour, minute)
-        val newWorkDayInfo = WorkDayInfo(
+        return WorkDayInfo(
             id = 0,
             day = today,
             firstEnterTime = selectedTime,
@@ -128,16 +164,12 @@ class ExitTimeViewModel @Inject constructor(
             secondEnterTime = null,
             secondExitTime = null
         )
-        return newWorkDayInfo
     }
 
-    private fun createWorkDayInfoWithExitTime(
-        hour: Int,
-        minute: Int
-    ): WorkDayInfo {
+    private fun createWorkDayInfoWithExitTime(hour: Int, minute: Int): WorkDayInfo {
         val today = LocalDate.now()
         val selectedTime = LocalTime.of(hour, minute)
-        val newWorkDayInfo = WorkDayInfo(
+        return WorkDayInfo(
             id = 0,
             day = today,
             firstEnterTime = null,
@@ -145,177 +177,6 @@ class ExitTimeViewModel @Inject constructor(
             secondEnterTime = null,
             secondExitTime = null
         )
-        return newWorkDayInfo
-    }
-
-    private fun calculateTime() {
-        try {
-            state.value.enterTime?.let { enterTime ->
-                if (_state.value.isExitTimeEntered()) {
-                    handleExitTimeProvided(enterTime, _state.value.exitTime!!)
-                } else {
-                    handleNoExitTime(enterTime)
-                }
-            }
-        } catch (e: DateTimeParseException) {
-            handleInvalidTimeFormat()
-        } catch (e: IllegalArgumentException) {
-            handleInvalidExitTime()
-        }
-    }
-
-    private fun handleExitTimeProvided(enterTime: LocalTime, exitTimeProvided: LocalTime) {
-
-        if (exitTimeProvided.isBefore(enterTime)) {
-            showSnackbar("Exit time cannot be before enter time")
-        } else {
-            val lateEntryTimeOff = calculateLateEntryTimeOff(enterTime)
-            val overtime = calculateOvertime(enterTime, exitTimeProvided)
-
-            calculateVacation(enterTime, exitTimeProvided)
-            updateTotalTimeSpent(enterTime, exitTimeProvided, overtime)
-        }
-    }
-
-    private fun calculateLateEntryTimeOff(enterTime: LocalTime): Duration {
-        return if (enterTime.isAfter(latestStart)) {
-            Duration.between(latestStart, enterTime)
-        } else {
-            Duration.ZERO
-        }
-    }
-
-    private fun calculateOvertime(enterTime: LocalTime, exitTime: LocalTime): Duration {
-        var overtime = Duration.ZERO
-        val standardEndTime = LocalTime.of(17, 45)
-
-        // Calculate overtime for working past the standard end time
-        if (exitTime.isAfter(standardEndTime)) {
-            overtime = overtime.plus(Duration.between(standardEndTime, exitTime))
-        }
-
-        // Calculate early entry overtime (if entered between earliestStart and latestStart)
-        if (enterTime.isAfter(earliestStart) && enterTime.isBefore(latestStart)) {
-            val earlyEntryDuration = Duration.between(enterTime, latestStart)
-            val totalWorkDuration = Duration.between(enterTime, exitTime)
-
-            if (totalWorkDuration > workDuration) {
-                overtime = overtime.plus(earlyEntryDuration)
-            }
-        }
-
-        return overtime
-    }
-
-    private fun handleNoExitTime(enterTime: LocalTime) {
-        if (enterTime.isAfter(latestStart)) {
-            updateLateStartState(enterTime)
-        } else {
-            _state.update { currentState ->
-                currentState.copy(
-                    timeWorked = null,
-                    overtime = null,
-                    vacationList = emptyList()
-                )
-            }
-            calculateAndUpdateDefaultExitTime(enterTime)
-        }
-    }
-
-    private fun updateTotalTimeSpent(
-        enterTime: LocalTime,
-        exitTime: LocalTime,
-        overtime: Duration
-    ) {
-        val timeWorkedSegment = getTotalTimeWorkInSegment(enterTime, exitTime)
-
-        val overtimeSegment = overTimeToTimeSegment(overtime, exitTime)
-
-        _state.update { currentState ->
-            currentState.copy(
-                exitTime = null,
-                timeWorked = timeWorkedSegment,
-                overtime = overtimeSegment
-            )
-        }
-    }
-
-    private fun getTotalTimeWorkInSegment(
-        enterTime: LocalTime,
-        exitTime: LocalTime
-    ): TimeSegment {
-        val totalTimeWorked = Duration.between(enterTime, exitTime)
-        val totalTimeWorkedHours = totalTimeWorked.toHours().toInt()
-        val totalTimeWorkedMinutes = (totalTimeWorked.toMinutes() % 60).toInt()
-
-        val timeWorkedDuration = String.format(
-            Locale.US,
-            "%02d:%02d",
-            totalTimeWorkedHours,
-            totalTimeWorkedMinutes
-        )
-
-        val timeWorkedSegment = TimeSegment(
-            startTime = enterTime.toString(),
-            endTime = exitTime.toString(),
-            duration = timeWorkedDuration
-        )
-        return timeWorkedSegment
-    }
-
-    private fun overTimeToTimeSegment(
-        overtime: Duration,
-        exitTime: LocalTime
-    ): TimeSegment? {
-        val overtimeSegment = if (!overtime.isZero) {
-            val overtimeHours = overtime.toHours().toInt()
-            val overtimeMinutes = (overtime.toMinutes() % 60).toInt()
-
-            TimeSegment(
-                startTime = exitTime.toString(),
-                endTime = exitTime.plusHours(overtimeHours.toLong())
-                    .plusMinutes(overtimeMinutes.toLong()).toString(),
-                duration = String.format(
-                    Locale.US,
-                    "%02d:%02d",
-                    overtimeHours,
-                    overtimeMinutes
-                )
-            )
-        } else {
-            null
-        }
-        return overtimeSegment
-    }
-
-    private fun updateLateStartState(enterTime: LocalTime) {
-        val vacationStart = latestStart
-        val vacationDuration = Duration.between(vacationStart, enterTime)
-
-        _state.update { currentState ->
-            currentState.copy(
-                exitTime = LocalTime.of(17, 45),
-                timeWorked = null,
-                overtime = null,
-                vacationList = listOf(
-                    TimeSegment(
-                        startTime = vacationStart.format(timeFormatter),
-                        endTime = enterTime.format(timeFormatter),
-                        duration = formatDuration(vacationDuration)
-                    )
-                )
-            )
-        }
-    }
-
-    private fun calculateAndUpdateDefaultExitTime(enterTime: LocalTime) {
-        val exitTimeCalculated = enterTime.plusHours(8).plusMinutes(45)
-
-        _state.update { currentState ->
-            currentState.copy(
-                exitTime = exitTimeCalculated
-            )
-        }
     }
 
     private fun handleInvalidTimeFormat() {
@@ -324,58 +185,38 @@ class ExitTimeViewModel @Inject constructor(
                 exitTime = null,
                 timeWorked = null,
                 overtime = null,
-                vacationList = emptyList()
+                timeOffList = emptyList()
             )
         }
         showSnackbar("Invalid time format")
     }
 
-    private fun handleInvalidExitTime() {
-        _state.update { currentState ->
-            currentState.copy(
-                exitTime = null,
-                timeWorked = null,
-                overtime = null,
+    private fun showSnackbar(message: String) {
+        viewModelScope.launch {
+            SnackbarController.sendEvent(
+                event = SnackbarEvent(message = message)
             )
         }
     }
 
-    private fun calculateVacation(enterTime: LocalTime, exitTime: LocalTime) {
-        val workedDuration = Duration.between(enterTime, exitTime)
-        val vacationList = mutableListOf<TimeSegment>()
+    private fun getTotalTimeWorkInSegment(enterTime: LocalTime, exitTime: LocalTime): TimeSegment {
+        val totalTimeWorked = Duration.between(enterTime, exitTime)
+        return TimeSegment(
+            startTime = enterTime.toFormattedString(),
+            endTime = exitTime.toFormattedString(),
+            duration = formatDuration(totalTimeWorked)
+        )
+    }
 
-        if (enterTime.isAfter(LocalTime.of(9, 0))) {
-            val lateEntryVacationStart = LocalTime.of(9, 0)
-            val vacationDuration = Duration.between(lateEntryVacationStart, enterTime)
-            vacationList.add(
-                TimeSegment(
-                    startTime = lateEntryVacationStart.format(timeFormatter),
-                    endTime = enterTime.format(timeFormatter),
-                    duration = formatDuration(vacationDuration)
-                )
+    private fun overTimeToTimeSegment(overtime: Duration, exitTime: LocalTime): TimeSegment? {
+        return if (!overtime.isZero) {
+            TimeSegment(
+                startTime = exitTime.toFormattedString(),
+                endTime = exitTime.plus(overtime).toFormattedString(),
+                duration = formatDuration(overtime)
             )
-        }
-
-        if (workedDuration < workDuration) {
-            val missingDuration = workDuration.minus(workedDuration)
-            if (exitTime.isBefore(latestEnd)) {
-                val endVacationEnd = minOf(exitTime.plus(missingDuration), latestEnd)
-                val vacationDuration = Duration.between(exitTime, endVacationEnd)
-                vacationList.add(
-                    TimeSegment(
-                        startTime = exitTime.format(timeFormatter),
-                        endTime = endVacationEnd.format(timeFormatter),
-                        duration = formatDuration(vacationDuration)
-                    )
-                )
-            }
-        }
-
-        // Update state with the vacation list
-        _state.update { currentState ->
-            currentState.copy(
-                vacationList = vacationList
-            )
+        } else {
+            null
         }
     }
 
@@ -384,15 +225,4 @@ class ExitTimeViewModel @Inject constructor(
         val minutes = duration.toMinutes() % 60
         return String.format(Locale.US, "%02d:%02d", hours, minutes)
     }
-
-    private fun showSnackbar(message: String) {
-        viewModelScope.launch {
-            SnackbarController.sendEvent(
-                event = SnackbarEvent(
-                    message = message
-                )
-            )
-        }
-    }
-
 }

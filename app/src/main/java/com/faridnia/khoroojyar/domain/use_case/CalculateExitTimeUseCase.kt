@@ -1,34 +1,24 @@
 package com.faridnia.khoroojyar.domain.use_case
 
-import com.faridnia.khoroojyar.data.room.WorkDayInfo
 import com.faridnia.khoroojyar.domain.repository.DataStoreRepository
 import kotlinx.coroutines.flow.first
-import java.time.Duration
 import java.time.LocalTime
 import javax.inject.Inject
 
-class CalculateOvertimeUseCase @Inject constructor(
+class CalculateExitTimeUseCase @Inject constructor(
     private val dataStoreRepository: DataStoreRepository
 ) {
 
-    suspend operator fun invoke(workDayInfo: WorkDayInfo): Duration {
+    suspend operator fun invoke(enterTime: LocalTime?): LocalTime? {
         val timeSettings = dataStoreRepository.getTimeSettings().first()
 
         val adjustedStartTime = adjustStartTime(
-            workDayInfo.firstEnterTime,
+            enterTime,
             timeSettings.earliestStart,
             timeSettings.latestStart
         )
 
-        val workedDuration = calculateShiftDuration(adjustedStartTime, workDayInfo.firstExitTime)
-
-        val overtime = if (workedDuration > timeSettings.workDuration) {
-            workedDuration - timeSettings.workDuration
-        } else {
-            Duration.ZERO
-        }
-
-        return overtime
+        return adjustedStartTime?.plus(timeSettings.workDuration)
     }
 
     private fun adjustStartTime(
@@ -41,14 +31,6 @@ class CalculateOvertimeUseCase @Inject constructor(
             enterTime.isBefore(earliestStart) -> earliestStart
             enterTime.isAfter(latestStart) -> latestStart
             else -> enterTime
-        }
-    }
-
-    private fun calculateShiftDuration(startTime: LocalTime?, endTime: LocalTime?): Duration {
-        return if (startTime != null && endTime != null) {
-            Duration.between(startTime, endTime)
-        } else {
-            Duration.ZERO
         }
     }
 }
