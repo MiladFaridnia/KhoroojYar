@@ -54,7 +54,6 @@ fun WorkingHourItem(
             time?.let {
                 CustomText(
                     textAlign = TextAlign.Left,
-                    modifier = Modifier.weight(1f),
                     text = time, style = MaterialTheme.typography.bodySmall
                 )
             }

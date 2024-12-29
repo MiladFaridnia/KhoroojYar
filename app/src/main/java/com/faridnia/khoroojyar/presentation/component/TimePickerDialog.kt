@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -80,10 +81,14 @@ fun TimePickerDialog(
                 ) {
                     Checkbox(
                         checked = isSaveTime,
+                        colors = CheckboxDefaults.colors(
+                            uncheckedColor = MaterialTheme.colorScheme.onBackground,
+                        ),
                         onCheckedChange = { isChecked ->
                             isSaveTime = isChecked
                             onCheckChange(isChecked, timePickerState)
-                        })
+                        }
+                    )
                     CustomText(
                         text = stringResource(R.string.save),
                         color = MaterialTheme.colorScheme.primary

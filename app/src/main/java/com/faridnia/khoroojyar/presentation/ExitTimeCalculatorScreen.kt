@@ -50,6 +50,7 @@ import com.faridnia.khoroojyar.presentation.component.home.ProgressBarWithMessag
 import com.faridnia.khoroojyar.presentation.component.home.WorkingHourItem
 import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 import com.faridnia.khoroojyar.util.DateHelper
+import com.faridnia.khoroojyar.util.toFormattedString
 import com.razaghimahdi.compose_persian_date.core.PersianDatePickerController
 import java.util.Locale
 
@@ -193,7 +194,7 @@ fun ExitTimeCalcContent(
                         }
                     }
 
-                    state.exitTime?.let { exitTime ->
+                    state.canExitTime?.let { exitTime ->
                         item {
                             WorkingHourItem(
                                 title = stringResource(R.string.exit_time),
@@ -203,7 +204,7 @@ fun ExitTimeCalcContent(
                         }
                     }
 
-                    state.vacationList.takeIf { it.isNotEmpty() }?.let { vacationList ->
+                    state.timeOffList.takeIf { it.isNotEmpty() }?.let { timeOffList ->
                         val ordinalSuffixes = listOf(
                             "First",
                             "Second",
@@ -217,8 +218,8 @@ fun ExitTimeCalcContent(
                             "Tenth"
                         )
 
-                        itemsIndexed(vacationList) { index: Int, item: TimeSegment ->
-                            val title = when (vacationList.size) {
+                        itemsIndexed(timeOffList) { index: Int, item: TimeSegment ->
+                            val title = when (timeOffList.size) {
                                 1 -> "Time Off"
                                 else -> "${ordinalSuffixes.getOrElse(index) { "${index + 1}th" }} Time Off"
                             }
