@@ -16,4 +16,12 @@
     <string name="confirm">Confirm</string>
     <string name="enter_time">Enter Time</string>
     <string name="save">Save</string>
+    <string name="earliest_start">Earliest Start</string>
+    <string name="latest_start">Latest Start</string>
+    <string name="work_duration">Work Duration</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="press_back_again_to_exit">Press back again to exit</string>
+    <string name="home">Home</string>
+    <string name="analytics">Analytics</string>
+    <string name="settings">Settings</string>
 </resources>

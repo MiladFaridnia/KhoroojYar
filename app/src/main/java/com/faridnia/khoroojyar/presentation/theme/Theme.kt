@@ -1,14 +1,13 @@
 package com.faridnia.khoroojyar.presentation.theme
 
-import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = myDarkColorScheme()
 
@@ -16,8 +15,8 @@ private val LightColorScheme = myLightColorScheme()
 
 fun myLightColorScheme(): ColorScheme = ColorScheme(
     primary = Caribbean_Green,
-    onPrimary = Light_Green,
-    primaryContainer = Honeydew,
+    onPrimary = Fence_Green,
+    primaryContainer = Light_Green,
     onPrimaryContainer = Fence_Green,
     inversePrimary = Light_Blue,
 
@@ -61,10 +60,9 @@ fun myLightColorScheme(): ColorScheme = ColorScheme(
     surfaceDim = Light_Green,
 )
 
-
 fun myDarkColorScheme(): ColorScheme = ColorScheme(
     primary = Caribbean_Green,
-    onPrimary = Light_Green,
+    onPrimary = Fence_Green, // Updated onPrimary color
     primaryContainer = Fence_Green,
     onPrimaryContainer = Caribbean_Green,
     inversePrimary = Light_Blue,
@@ -113,18 +111,14 @@ fun myDarkColorScheme(): ColorScheme = ColorScheme(
 @Composable
 fun KhoroojYarTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-
-    ChangeStatusBarColor(colorScheme, colorScheme)
-
     val colorScheme = when {
-
-        /* dynamicColor -> {
-                        val context = LocalContext.current
-                         if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }*/
+        dynamicColor -> {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
 
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
@@ -135,17 +129,4 @@ fun KhoroojYarTheme(
         typography = Typography,
         content = content
     )
-}
-
-@Composable
-private fun ChangeStatusBarColor(
-    colorScheme: ColorScheme,
-    colorScheme0: ColorScheme
-) {
-    val view = LocalView.current
-    if (view.context is Activity) {
-        val window = (view.context as Activity).window
-        window.statusBarColor = colorScheme.background.toArgb()
-        window.navigationBarColor = colorScheme0.background.toArgb()
-    }
 }

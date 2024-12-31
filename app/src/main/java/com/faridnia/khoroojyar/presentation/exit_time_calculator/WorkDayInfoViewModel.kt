@@ -1,4 +1,4 @@
-package com.faridnia.khoroojyar.presentation
+package com.faridnia.khoroojyar.presentation.exit_time_calculator
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

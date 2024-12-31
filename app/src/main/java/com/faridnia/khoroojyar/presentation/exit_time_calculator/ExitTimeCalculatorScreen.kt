@@ -1,4 +1,4 @@
-package com.faridnia.khoroojyar.presentation
+package com.faridnia.khoroojyar.presentation.exit_time_calculator
 
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
@@ -35,13 +35,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.faridnia.khoroojyar.R
 import com.faridnia.khoroojyar.presentation.calculate_days_off.CalculateRemainedDaysOff
 import com.faridnia.khoroojyar.presentation.component.CustomBox
 import com.faridnia.khoroojyar.presentation.component.CustomText
+import com.faridnia.khoroojyar.presentation.component.DoubleBackPressToExit
 import com.faridnia.khoroojyar.presentation.component.ExtraRoundCard
 import com.faridnia.khoroojyar.presentation.component.LightAndDarkPreview
 import com.faridnia.khoroojyar.presentation.component.TimePickerDialog
+import com.faridnia.khoroojyar.presentation.component.bottom_navigation.BottomNavigationBar
 import com.faridnia.khoroojyar.presentation.component.employee_commute.EmployeeCommute
 import com.faridnia.khoroojyar.presentation.component.home.DateItem
 import com.faridnia.khoroojyar.presentation.component.home.DateTimeHeader
@@ -51,17 +54,25 @@ import com.faridnia.khoroojyar.presentation.component.home.WorkingHourItem
 import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 import com.faridnia.khoroojyar.util.DateHelper
 import com.faridnia.khoroojyar.util.toFormattedString
+import com.jrg.app.ui.component.snackbar.CustomScaffold
 import com.razaghimahdi.compose_persian_date.core.PersianDatePickerController
 import java.util.Locale
 
 @Composable
-fun ExitTimeCalculatorScreen(viewModel: ExitTimeViewModel = hiltViewModel()) {
+fun ExitTimeCalculatorScreen(
+    navController: NavController,
+    viewModel: ExitTimeViewModel = hiltViewModel()
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-
-    ExitTimeCalcContent(
-        state = state,
-        onEvent = viewModel::onEvent
-    )
+    CustomScaffold(
+        bottomBar = { BottomNavigationBar(navController) }
+    ) {
+        ExitTimeCalcContent(
+            state = state,
+            onEvent = viewModel::onEvent
+        )
+    }
+    DoubleBackPressToExit()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -239,12 +250,15 @@ fun ExitTimeCalcContent(
 
     if (showEnterTimePickerDialog) {
         TimePickerDialog(
-            onConfirm = { isChecked, timePickerState ->
+            onConfirm = { timePickerState ->
                 onTimeConfirm(
                     timePickerState,
                     { onEvent(ExitTimeCalculatorEvent.OnEnterTimeChange(it)) }
                 ) { showEnterTimePickerDialog = it }
-
+            },
+            onDismiss = { showEnterTimePickerDialog = false },
+            showSaveOption = true,
+            onSaveChecked = { isChecked, timePickerState ->
                 onEvent(
                     ExitTimeCalculatorEvent.OnEnterTimeSave(
                         isChecked,
@@ -252,20 +266,21 @@ fun ExitTimeCalcContent(
                         timePickerState.minute
                     )
                 )
-            },
-            onCheckChange = { _, _ -> },
-            onDismiss = { showEnterTimePickerDialog = false }
+            }
         )
     }
 
     if (showExitTimePickerDialog) {
         TimePickerDialog(
-            onConfirm = { isChecked, timePickerState ->
+            onConfirm = { timePickerState ->
                 onTimeConfirm(
                     timePickerState,
                     { onEvent(ExitTimeCalculatorEvent.OnExitTimeChange(it)) }
-                ) { showExitTimePickerDialog = it }
-
+                ) { showEnterTimePickerDialog = it }
+            },
+            onDismiss = { showEnterTimePickerDialog = false },
+            showSaveOption = true,
+            onSaveChecked = { isChecked, timePickerState ->
                 onEvent(
                     ExitTimeCalculatorEvent.OnExitTimeSave(
                         isChecked,
@@ -273,9 +288,7 @@ fun ExitTimeCalcContent(
                         timePickerState.minute
                     )
                 )
-            },
-            onCheckChange = { _, _ -> },
-            onDismiss = { showExitTimePickerDialog = false }
+            }
         )
     }
 

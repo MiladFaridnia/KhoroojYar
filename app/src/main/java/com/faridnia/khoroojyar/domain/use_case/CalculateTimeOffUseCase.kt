@@ -2,8 +2,7 @@ package com.faridnia.khoroojyar.domain.use_case
 
 import com.faridnia.khoroojyar.data.room.WorkDayInfo
 import com.faridnia.khoroojyar.domain.repository.DataStoreRepository
-import com.faridnia.khoroojyar.presentation.TimeSegment
-import com.faridnia.khoroojyar.util.formatDuration
+import com.faridnia.khoroojyar.presentation.exit_time_calculator.TimeSegment
 import com.faridnia.khoroojyar.util.toFormattedString
 import kotlinx.coroutines.flow.first
 import java.time.Duration
@@ -53,7 +52,7 @@ class CalculateTimeOffUseCase @Inject constructor(
                     TimeSegment(
                         startTime = latestStart.toFormattedString(),
                         endTime = enterTime.toFormattedString(),
-                        duration = Duration.between(latestStart, enterTime).formatDuration()
+                        duration = Duration.between(latestStart, enterTime).toFormattedString()
                     )
                 )
             }
@@ -71,7 +70,7 @@ class CalculateTimeOffUseCase @Inject constructor(
             TimeSegment(
                 startTime = it.toFormattedString(),
                 endTime = earliestEnd.toFormattedString(),
-                duration = Duration.between(it, earliestEnd).formatDuration()
+                duration = Duration.between(it, earliestEnd).toFormattedString()
             )
         }
     }
@@ -89,7 +88,7 @@ class CalculateTimeOffUseCase @Inject constructor(
             TimeSegment(
                 startTime = exitTime.toFormattedString(),
                 endTime = missingEndTime.toFormattedString(),
-                duration = missingDuration.formatDuration()
+                duration = missingDuration.toFormattedString()
             )
         } else {
             null
@@ -120,7 +119,7 @@ class CalculateTimeOffUseCase @Inject constructor(
                     duration = Duration.between(
                         LocalTime.parse(currentSegment.startTime),
                         LocalTime.parse(maxOf(currentSegment.endTime, nextSegment.endTime))
-                    ).formatDuration()
+                    ).toFormattedString()
                 )
             } else {
                 optimized.add(currentSegment)

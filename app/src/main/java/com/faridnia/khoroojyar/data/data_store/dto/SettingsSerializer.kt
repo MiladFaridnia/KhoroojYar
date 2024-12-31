@@ -8,15 +8,15 @@ import kotlinx.serialization.json.Json
 import java.io.InputStream
 import java.io.OutputStream
 
-object TimeSettingsSerializer : Serializer<TimeSettings> {
+object SettingsSerializer : Serializer<Settings> {
 
-    override val defaultValue: TimeSettings
-        get() = TimeSettings()
+    override val defaultValue: Settings
+        get() = Settings()
 
-    override suspend fun readFrom(input: InputStream): TimeSettings {
+    override suspend fun readFrom(input: InputStream): Settings {
         return try {
             Json.decodeFromString(
-                deserializer = TimeSettings.serializer(),
+                deserializer = Settings.serializer(),
                 string = input.readBytes().decodeToString()
             )
         } catch (e: SerializationException) {
@@ -25,11 +25,11 @@ object TimeSettingsSerializer : Serializer<TimeSettings> {
         }
     }
 
-    override suspend fun writeTo(t: TimeSettings, output: OutputStream) {
+    override suspend fun writeTo(t: Settings, output: OutputStream) {
         withContext(Dispatchers.IO) {
             output.write(
                 Json.encodeToString(
-                    serializer = TimeSettings.serializer(),
+                    serializer = Settings.serializer(),
                     value = t
                 ).encodeToByteArray()
             )

@@ -10,8 +10,8 @@ plugins {
 
 android {
     val versionMajor = 1
-    val versionMinor = 24
-    val versionPatch = 3
+    val versionMinor = 25
+    val versionPatch = 0
     val appName = "KhoroojYar"
     val appVersionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
     val appVersionName = "$versionMajor.$versionMinor.$versionPatch"
@@ -103,6 +103,7 @@ dependencies {
     // Compose UI dependencies
     implementation(libs.androidx.compose.ui.ui)
     implementation(libs.androidx.compose.material3.material3)
+    implementation(libs.navigation.compose)
 
     // Lifecycle ViewModel integration for Compose
     implementation(libs.androidx.lifecycle.viewmodel.compose)
