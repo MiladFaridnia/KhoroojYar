@@ -14,7 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.faridnia.khoroojyar.presentation.component.bottom_navigation.BottomNavigationBar
+import androidx.navigation.NavController
 import com.faridnia.khoroojyar.presentation.component.snackbar.ObserveAsEvents
 import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarController
 import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarType
@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 fun CustomScaffold(
     snackbarType: SnackbarType = SnackbarType.ERROR,
     snackbarDuration: SnackbarDuration = SnackbarDuration.Short,
+    bottomBar: @Composable () -> Unit = {},
     content: @Composable () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -52,7 +53,7 @@ fun CustomScaffold(
     }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        bottomBar = { BottomNavigationBar() },
+        bottomBar = bottomBar,
         snackbarHost = {
             Box(modifier = Modifier.fillMaxSize()) {
                 SnackbarHost(

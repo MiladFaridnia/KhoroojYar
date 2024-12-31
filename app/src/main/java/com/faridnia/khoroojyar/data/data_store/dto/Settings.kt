@@ -5,7 +5,7 @@ import java.time.Duration
 import java.time.LocalTime
 
 @Serializable
-data class TimeSettings(
+data class Settings(
     @Serializable(with = DurationSerializer::class)
     val workDuration: Duration = Duration.ofHours(8).plusMinutes(45),
 
@@ -13,7 +13,8 @@ data class TimeSettings(
     val earliestStart: LocalTime = LocalTime.of(7, 0),
 
     @Serializable(with = LocalTimeSerializer::class)
-    val latestStart: LocalTime = LocalTime.of(9, 0)
+    val latestStart: LocalTime = LocalTime.of(9, 0),
+    val isDark: Boolean? = null
 ) {
     val earliestEnd: LocalTime
         get() = earliestStart.plus(workDuration)

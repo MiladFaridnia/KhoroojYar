@@ -4,7 +4,7 @@ import java.time.Duration
 import java.time.LocalTime
 import java.util.Locale
 
-fun Duration.formatDuration(): String {
+fun Duration.toFormattedString(): String {
     val hours = toHours()
     val minutes = toMinutes() % 60
     return String.format(Locale.US, "%02d:%02d", hours, minutes)
@@ -16,4 +16,8 @@ fun LocalTime?.toFormattedString(): String {
     val selectedTime =
         String.format(Locale.US, "%02d:%02d", selectedHour, selectedMinute)
     return selectedTime
+}
+
+fun Duration.toLocalTime(): LocalTime {
+    return LocalTime.ofSecondOfDay(toSeconds())
 }

@@ -32,26 +32,33 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.faridnia.khoroojyar.R
 import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
+import java.time.LocalTime
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePickerDialog(
-    onConfirm: (Boolean, TimePickerState) -> Unit,
-    onCheckChange: (Boolean, TimePickerState) -> Unit,
+    time: LocalTime? = null,
+    onConfirm: (TimePickerState) -> Unit,
     onDismiss: () -> Unit,
+    showSaveOption: Boolean = false,
+    onSaveChecked: ((Boolean, TimePickerState) -> Unit)? = null
 ) {
-    val currentTime = Calendar.getInstance()
-
+    val currentTime = time ?: LocalTime.now()
+    // State for the TimePicker
     val timePickerState = rememberTimePickerState(
-        initialHour = currentTime.get(Calendar.HOUR_OF_DAY),
-        initialMinute = currentTime.get(Calendar.MINUTE),
-        is24Hour = true,
+        initialHour = currentTime.hour,
+        initialMinute = currentTime.minute,
+        is24Hour = true
     )
 
-    var isSaveTime by remember { mutableStateOf(true) }
+    // State for Save Checkbox (if applicable)
+    var isSaveChecked by remember { mutableStateOf(false) }
 
-    BasicAlertDialog(onDismissRequest = onDismiss, modifier = Modifier.fillMaxWidth()) {
+    BasicAlertDialog(
+        onDismissRequest = onDismiss,
+        modifier = Modifier.fillMaxWidth()
+    ) {
         ElevatedCard(
             modifier = Modifier
                 .fillMaxWidth()
@@ -64,6 +71,7 @@ fun TimePickerDialog(
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // Time Picker
                 TimePicker(
                     modifier = Modifier.fillMaxWidth(),
                     state = timePickerState,
@@ -74,30 +82,41 @@ fun TimePickerDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Checkbox(
-                        checked = isSaveTime,
-                        colors = CheckboxDefaults.colors(
-                            uncheckedColor = MaterialTheme.colorScheme.onBackground,
-                        ),
-                        onCheckedChange = { isChecked ->
-                            isSaveTime = isChecked
-                            onCheckChange(isChecked, timePickerState)
-                        }
-                    )
-                    CustomText(
-                        text = stringResource(R.string.save),
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                // Show Save Option if Enabled
+                if (showSaveOption) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = isSaveChecked,
+                            colors = CheckboxDefaults.colors(
+                                uncheckedColor = MaterialTheme.colorScheme.onBackground,
+                            ),
+                            onCheckedChange = { isChecked ->
+                                isSaveChecked = isChecked
+                            }
+                        )
+                        Text(
+                            text = stringResource(R.string.save),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
 
+                // Confirm Button
                 Button(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { onConfirm(isSaveTime, timePickerState) }) {
+                    onClick = {
+                        onConfirm(timePickerState)
+                        if (showSaveOption)
+                            onSaveChecked?.invoke(isSaveChecked, timePickerState)
+                    }
+                ) {
                     Text(
                         text = stringResource(R.string.confirm),
                         fontFamily = FontFamily(Font(R.font.iran_sans_mobile_fa_num)),
@@ -114,8 +133,7 @@ fun TimePickerDialog(
 private fun TimePickerDialogPreview() {
     KhoroojYarTheme {
         TimePickerDialog(
-            onConfirm = { _, _ -> },
-            onCheckChange = { _, _ -> },
+            onConfirm = {},
             onDismiss = {}
         )
     }

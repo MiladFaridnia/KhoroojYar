@@ -1,4 +1,4 @@
-package com.faridnia.khoroojyar.presentation
+package com.faridnia.khoroojyar.presentation.exit_time_calculator
 
 data class TimeSegment(
     val startTime: String,

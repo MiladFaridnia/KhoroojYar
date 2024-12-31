@@ -16,4 +16,12 @@
     <string name="confirm">تایید</string>
     <string name="enter_time">زمان ورود</string>
     <string name="save">ذخیره</string>
+    <string name="earliest_start">زودترین زمان ورود</string>
+    <string name="latest_start">دیرترین زمان ورود</string>
+    <string name="work_duration">مدت زمان کار</string>
+    <string name="dark_mode">مود تاریک</string>
+    <string name="press_back_again_to_exit">لطفا برای خروج دکمه بازگشت را مجددا فشار دهید</string>
+    <string name="home">خانه</string>
+    <string name="analytics">تحلیل</string>
+    <string name="settings">تنظیمات</string>
 </resources>
