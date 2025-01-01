@@ -3,6 +3,7 @@ package com.faridnia.khoroojyar.data.room
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -18,4 +19,25 @@ data class WorkDayInfo(
     val firstExitTime: LocalTime?,
     val secondEnterTime: LocalTime? = null,
     val secondExitTime: LocalTime? = null
-)
+) {
+    val workedTime: Float by lazy {
+        calculateWorkTime()
+    }
+}
+
+// Extension function to calculate work time in hours
+fun WorkDayInfo.calculateWorkTime(): Float {
+    val firstShiftDuration = calculateDuration(firstEnterTime, firstExitTime)
+    val secondShiftDuration = calculateDuration(secondEnterTime, secondExitTime)
+
+    return (firstShiftDuration + secondShiftDuration) / 60f // Convert minutes to hours
+}
+
+// Helper function to calculate the duration between two times
+private fun calculateDuration(startTime: LocalTime?, endTime: LocalTime?): Long {
+    return if (startTime != null && endTime != null) {
+        Duration.between(startTime, endTime).toMinutes()
+    } else {
+        0L
+    }
+}

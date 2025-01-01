@@ -3,7 +3,6 @@ package com.faridnia.khoroojyar.domain.use_case
 import com.faridnia.khoroojyar.data.room.WorkDayInfo
 import com.faridnia.khoroojyar.domain.repository.DataStoreRepository
 import com.faridnia.khoroojyar.presentation.exit_time_calculator.TimeSegment
-import com.faridnia.khoroojyar.util.toFormattedString
 import kotlinx.coroutines.flow.first
 import java.time.Duration
 import java.time.LocalTime
@@ -46,16 +45,18 @@ class CalculateTimeOffUseCase @Inject constructor(
             enterTime.isBefore(earliestStart) -> {
                 Pair(earliestStart, null)
             }
+
             enterTime.isAfter(latestStart) -> {
                 Pair(
                     latestStart,
                     TimeSegment(
-                        startTime = latestStart.toFormattedString(),
-                        endTime = enterTime.toFormattedString(),
-                        duration = Duration.between(latestStart, enterTime).toFormattedString()
+                        startTime = latestStart,
+                        endTime = enterTime,
+                        duration = Duration.between(latestStart, enterTime)
                     )
                 )
             }
+
             else -> {
                 Pair(enterTime, null)
             }
@@ -68,9 +69,9 @@ class CalculateTimeOffUseCase @Inject constructor(
     ): TimeSegment? {
         return exitTime?.takeIf { it.isBefore(earliestEnd) }?.let {
             TimeSegment(
-                startTime = it.toFormattedString(),
-                endTime = earliestEnd.toFormattedString(),
-                duration = Duration.between(it, earliestEnd).toFormattedString()
+                startTime = it,
+                endTime = earliestEnd,
+                duration = Duration.between(it, earliestEnd)
             )
         }
     }
@@ -86,9 +87,9 @@ class CalculateTimeOffUseCase @Inject constructor(
             val missingEndTime = exitTime?.plus(missingDuration)
 
             TimeSegment(
-                startTime = exitTime.toFormattedString(),
-                endTime = missingEndTime.toFormattedString(),
-                duration = missingDuration.toFormattedString()
+                startTime = exitTime ?: LocalTime.of(0, 0),
+                endTime = missingEndTime ?: LocalTime.of(0, 0),
+                duration = missingDuration
             )
         } else {
             null
@@ -117,9 +118,9 @@ class CalculateTimeOffUseCase @Inject constructor(
                     startTime = currentSegment.startTime,
                     endTime = maxOf(currentSegment.endTime, nextSegment.endTime),
                     duration = Duration.between(
-                        LocalTime.parse(currentSegment.startTime),
-                        LocalTime.parse(maxOf(currentSegment.endTime, nextSegment.endTime))
-                    ).toFormattedString()
+                        currentSegment.startTime,
+                        maxOf(currentSegment.endTime, nextSegment.endTime)
+                    )
                 )
             } else {
                 optimized.add(currentSegment)
