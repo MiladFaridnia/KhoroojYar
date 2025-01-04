@@ -13,5 +13,5 @@ data class TimeSegment(
         get() = duration.toFormattedString()
 
     val startToEndTime
-        get() = "${startTime.toFormattedString()}_${startTime.toFormattedString()}"
+        get() = "${startTime.toFormattedString()}_${endTime.toFormattedString()}"
 }
