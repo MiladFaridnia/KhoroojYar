@@ -10,7 +10,7 @@ plugins {
 
 android {
     val versionMajor = 1
-    val versionMinor = 25
+    val versionMinor = 27
     val versionPatch = 0
     val appName = "KhoroojYar"
     val appVersionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
@@ -130,4 +130,9 @@ dependencies {
     //Kotlin Extensions and Coroutines support for Room
     implementation(libs.androidx.room.ktx)
     implementation(libs.kotlinx.serialization)
+
+    //Vico Charts
+//    implementation(libs.vico.compose)
+    implementation(libs.vico.compose.m3)
+    implementation(libs.vico.views)
 }

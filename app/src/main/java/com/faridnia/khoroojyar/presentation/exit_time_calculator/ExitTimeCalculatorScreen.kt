@@ -188,7 +188,7 @@ fun ExitTimeCalcContent(
                             WorkingHourItem(
                                 title = "Time Worked",
                                 time = it.startToEndTime,
-                                timeDuration = it.duration,
+                                timeDuration = it.formattedDuration,
                                 iconId = R.drawable.ic_timer
                             )
                         }
@@ -199,7 +199,7 @@ fun ExitTimeCalcContent(
                             WorkingHourItem(
                                 title = "Overtime",
                                 time = it.startToEndTime,
-                                timeDuration = it.duration,
+                                timeDuration = it.formattedDuration,
                                 iconId = R.drawable.ic_time_stop
                             )
                         }
@@ -238,7 +238,7 @@ fun ExitTimeCalcContent(
                             WorkingHourItem(
                                 title = title,
                                 time = item.startToEndTime,
-                                timeDuration = item.duration,
+                                timeDuration = item.formattedDuration,
                                 iconId = R.drawable.ic_timer_pause
                             )
                         }

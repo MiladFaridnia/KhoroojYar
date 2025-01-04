@@ -9,13 +9,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.faridnia.khoroojyar.presentation.component.CustomText
-import com.faridnia.khoroojyar.presentation.component.bottom_navigation.BottomNavigationBar
+import com.faridnia.khoroojyar.presentation.analitics.WorkDayChartScreen
 import com.faridnia.khoroojyar.presentation.exit_time_calculator.ExitTimeCalculatorScreen
 import com.faridnia.khoroojyar.presentation.settings.SettingsScreen
 import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 import com.faridnia.khoroojyar.presentation.util.Screen
-import com.jrg.app.ui.component.snackbar.CustomScaffold
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -40,9 +38,7 @@ class MainActivity : ComponentActivity() {
                             SettingsScreen(navController = navController)
                         }
                         composable(Screen.Analytics.route) {
-                            CustomScaffold(bottomBar = { BottomNavigationBar(navController) }) {
-                                CustomText(text = "Analytics")
-                            }
+                            WorkDayChartScreen(navController)
                         }
                     }
             }

@@ -1,7 +1,5 @@
 package com.faridnia.khoroojyar.presentation.settings
 
-import java.time.LocalTime
-
 sealed class SettingsEvent {
     data class TimeConfirmed(val hour: Int, val minute: Int) : SettingsEvent()
     data object TimeDialogDismissed : SettingsEvent()

@@ -10,7 +10,6 @@ import com.faridnia.khoroojyar.domain.use_case.db.GetWorkDayInfoByDayUseCase
 import com.faridnia.khoroojyar.domain.use_case.db.UpsertWorkDayInfoUseCase
 import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarController
 import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarEvent
-import com.faridnia.khoroojyar.util.toFormattedString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +18,6 @@ import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -202,27 +200,21 @@ class ExitTimeViewModel @Inject constructor(
     private fun getTotalTimeWorkInSegment(enterTime: LocalTime, exitTime: LocalTime): TimeSegment {
         val totalTimeWorked = Duration.between(enterTime, exitTime)
         return TimeSegment(
-            startTime = enterTime.toFormattedString(),
-            endTime = exitTime.toFormattedString(),
-            duration = formatDuration(totalTimeWorked)
+            startTime = enterTime,
+            endTime = exitTime,
+            duration = totalTimeWorked
         )
     }
 
     private fun overTimeToTimeSegment(overtime: Duration, exitTime: LocalTime): TimeSegment? {
         return if (!overtime.isZero) {
             TimeSegment(
-                startTime = exitTime.toFormattedString(),
-                endTime = exitTime.plus(overtime).toFormattedString(),
-                duration = formatDuration(overtime)
+                startTime = exitTime,
+                endTime = exitTime.plus(overtime),
+                duration = overtime
             )
         } else {
             null
         }
-    }
-
-    private fun formatDuration(duration: Duration): String {
-        val hours = duration.toHours()
-        val minutes = duration.toMinutes() % 60
-        return String.format(Locale.US, "%02d:%02d", hours, minutes)
     }
 }
