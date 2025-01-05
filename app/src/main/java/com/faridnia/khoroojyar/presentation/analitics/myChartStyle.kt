@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.faridnia.khoroojyar.presentation.theme.Caribbean_Green
 import com.faridnia.khoroojyar.presentation.theme.Cyprus
-import com.faridnia.khoroojyar.presentation.theme.Honeydew
+import com.faridnia.khoroojyar.presentation.theme.Light_Blue
 import com.faridnia.khoroojyar.presentation.theme.Ocean_Blue
 import com.faridnia.khoroojyar.presentation.theme.Vivid_Blue
 import com.patrykandpatrick.vico.compose.style.ChartStyle
@@ -20,8 +20,9 @@ fun myChartStyle(
     axisGuidelineColor: Color = Cyprus,
     axisLineColor: Color = Ocean_Blue,
     entityColors: List<Color> = listOf(
-        Caribbean_Green,
         Vivid_Blue,
+        Caribbean_Green,
+        Light_Blue
     ),
     elevationOverlayColor: Color = colorScheme.primary,
 ): ChartStyle = remember(
@@ -38,17 +39,17 @@ fun myChartStyle(
             axisLineColor = axisLineColor,
         ),
         columnChart = ChartStyle.ColumnChart(
-            columns = entityColors.map { color ->
-                LineComponent(
-                    color = Vivid_Blue.toArgb(),
-                    thicknessDp = 16f,
-                )
-            }
+              columns = entityColors.map { color ->
+                  LineComponent(
+                      color = color.toArgb(),
+                      thicknessDp = 16f,
+                  )
+              }
         ),
         lineChart = ChartStyle.LineChart(
             lines = entityColors.map { color ->
                 LineChart.LineSpec(
-                    lineColor = Honeydew.toArgb(),
+                    lineColor = color.toArgb(),
                 )
             }
         ),
