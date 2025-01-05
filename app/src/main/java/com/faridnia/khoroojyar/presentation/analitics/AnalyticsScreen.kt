@@ -15,7 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -42,10 +41,8 @@ import com.patrykandpatrick.vico.compose.chart.column.columnChart
 import com.patrykandpatrick.vico.compose.chart.line.lineChart
 import com.patrykandpatrick.vico.compose.component.shape.dashedShape
 import com.patrykandpatrick.vico.compose.style.ProvideChartStyle
-import com.patrykandpatrick.vico.core.chart.composed.plus
 import com.patrykandpatrick.vico.core.component.shape.Shapes
-import com.patrykandpatrick.vico.core.entry.composed.ComposedChartEntryModelProducer
-import com.patrykandpatrick.vico.core.entry.entriesOf
+import com.patrykandpatrick.vico.core.entry.entryModelOf
 
 @Composable
 fun WorkDayChartScreen(
@@ -65,15 +62,9 @@ fun WorkTimeChart(
     state: WorkDayInfoChartState,
     onEvent: (WorkDayChartEvent) -> Unit
 ) {
-    val columnChart = columnChart()
-    val lineChart = lineChart()
-
-    val composedChartEntryModelProducer = ComposedChartEntryModelProducer.build {
-        add(entriesOf(*state.workedTimeList.mapIndexed { index, value -> index.toFloat() to value }
-            .toTypedArray()))
-        add(entriesOf(*state.workedTimeList.mapIndexed { index, value -> index.toFloat() to value }
-            .toTypedArray()))
-    }
+    val chartEntryModel = entryModelOf(
+        *state.workedTimeList.toTypedArray(),
+    )
 
     val scrollState = rememberScrollState()
 
@@ -139,10 +130,8 @@ fun WorkTimeChart(
                                 modifier = Modifier
                                     .background(Honeydew)
                                     .padding(6.dp),
-                                chart = remember(columnChart, lineChart) {
-                                    columnChart + lineChart
-                                },
-                                chartModelProducer = composedChartEntryModelProducer,
+                                chart = lineChart(),
+                                model = chartEntryModel,
                                 startAxis = rememberStartAxis(
                                     axis = null,
                                     guideline = axisGuidelineComponent(
@@ -164,10 +153,8 @@ fun WorkTimeChart(
                                 modifier = Modifier
                                     .background(Honeydew)
                                     .padding(6.dp),
-                                chart = remember(columnChart, lineChart) {
-                                    columnChart + lineChart
-                                },
-                                chartModelProducer = composedChartEntryModelProducer,
+                                chart = columnChart(),
+                                model = chartEntryModel,
                                 startAxis = rememberStartAxis(
                                     axis = null,
                                     guideline = axisGuidelineComponent(
@@ -186,7 +173,7 @@ fun WorkTimeChart(
                     }
                 }
 
-                state.remainedTimeOff.let {
+                        state . remainedTimeOff . let {
                     WorkingHourItem(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         title = "Time Worked",
