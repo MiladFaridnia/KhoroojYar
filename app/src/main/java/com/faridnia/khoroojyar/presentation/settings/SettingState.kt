@@ -9,5 +9,6 @@ data class SettingState(
     val workDuration: Duration? = null,
     val isDark: Boolean? = null,
     val currentTimeForTimePicker: LocalTime? = null,
-    val showTimePickerDialog: Boolean = false
+    val showTimePickerDialog: Boolean = false,
+    val areNotificationsEnabled: Boolean = false
 )

@@ -55,4 +55,10 @@ class DataStoreRepositoryImpl(
             currentSettings.copy(isDark = isDark)
         }
     }
+
+    override suspend fun updateNotificationsEnabled(isEnabled: Boolean) {
+        dataStore.updateData { currentSettings ->
+            currentSettings.copy(areNotificationsEnabled = isEnabled)
+        }
+    }
 }

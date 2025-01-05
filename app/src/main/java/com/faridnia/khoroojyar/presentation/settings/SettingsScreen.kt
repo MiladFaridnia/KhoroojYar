@@ -38,6 +38,7 @@ import com.faridnia.khoroojyar.presentation.component.LightAndDarkPreview
 import com.faridnia.khoroojyar.presentation.component.TimePickerDialog
 import com.faridnia.khoroojyar.presentation.component.bottom_navigation.BottomNavigationBar
 import com.faridnia.khoroojyar.presentation.settings.component.SwitchDarkMode
+import com.faridnia.khoroojyar.presentation.settings.component.SwitchNotification
 import com.faridnia.khoroojyar.presentation.settings.component.TimeSettingsItem
 import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 import com.faridnia.khoroojyar.util.toFormattedString
@@ -114,6 +115,10 @@ fun SettingsContent(state: SettingState, onEvent: (SettingsEvent) -> Unit) {
                     isChecked = state.isDark ?: isSystemInDarkTheme(),
                     onCheckedChange = { onEvent(SettingsEvent.DarkModeClicked(it)) }
                 )
+                SwitchNotification(
+                    isChecked = state.areNotificationsEnabled,
+                    onCheckedChange = { onEvent(SettingsEvent.NotificationsToggled(it)) }
+                )
                 TimeSettingsItem(
                     title = stringResource(id = com.faridnia.khoroojyar.R.string.earliest_start),
                     time = state.earliestStart?.toFormattedString(),
@@ -146,7 +151,6 @@ fun SettingsContent(state: SettingState, onEvent: (SettingsEvent) -> Unit) {
         }
     }
 }
-
 
 @LightAndDarkPreview
 @Composable

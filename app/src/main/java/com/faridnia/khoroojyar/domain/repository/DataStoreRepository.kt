@@ -12,4 +12,5 @@ interface DataStoreRepository {
     suspend fun updateLatestStart(latestStart: LocalTime)
     suspend fun updateWorkDuration(workDuration: Duration)
     suspend fun updateDarkMode(isDark: Boolean)
+    suspend fun updateNotificationsEnabled(isEnabled: Boolean)
 }
