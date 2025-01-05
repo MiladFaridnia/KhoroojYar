@@ -18,6 +18,19 @@ fun LocalTime?.toFormattedString(): String {
     return selectedTime
 }
 
+fun String.toLocalTime(): LocalTime? {
+    return try {
+        val parts = split(":").map { it.toInt() }
+        if (parts.size == 2) {
+            LocalTime.of(parts[0], parts[1])
+        } else {
+            null // Invalid format
+        }
+    } catch (e: Exception) {
+        null // Handle invalid input
+    }
+}
+
 fun Duration.toLocalTime(): LocalTime {
     return LocalTime.ofSecondOfDay(toSeconds())
 }

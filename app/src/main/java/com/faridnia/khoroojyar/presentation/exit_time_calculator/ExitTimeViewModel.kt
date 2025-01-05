@@ -6,6 +6,7 @@ import com.faridnia.khoroojyar.data.room.WorkDayInfo
 import com.faridnia.khoroojyar.domain.use_case.CalculateExitTimeUseCase
 import com.faridnia.khoroojyar.domain.use_case.CalculateOvertimeUseCase
 import com.faridnia.khoroojyar.domain.use_case.CalculateTimeOffUseCase
+import com.faridnia.khoroojyar.domain.use_case.notification.ScheduleNotificationUseCase
 import com.faridnia.khoroojyar.domain.use_case.db.GetWorkDayInfoByDayUseCase
 import com.faridnia.khoroojyar.domain.use_case.db.UpsertWorkDayInfoUseCase
 import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarController
@@ -26,7 +27,8 @@ class ExitTimeViewModel @Inject constructor(
     private val calculateOvertimeUseCase: CalculateOvertimeUseCase,
     private val calculateTimeOffUseCase: CalculateTimeOffUseCase,
     private val upsertWorkDayInfoUseCase: UpsertWorkDayInfoUseCase,
-    private val getWorkDayInfo: GetWorkDayInfoByDayUseCase
+    private val getWorkDayInfo: GetWorkDayInfoByDayUseCase,
+    private val scheduleNotificationUseCase: ScheduleNotificationUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ExitTimeState())
@@ -83,6 +85,9 @@ class ExitTimeViewModel @Inject constructor(
             val newEnterTime = LocalTime.parse(time)
             _state.update { currentState ->
                 currentState.copy(enterTime = newEnterTime)
+            }
+            viewModelScope.launch {
+                scheduleNotificationUseCase(newEnterTime)
             }
             calculateTime()
         } catch (e: Exception) {

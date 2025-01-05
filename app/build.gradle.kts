@@ -10,8 +10,8 @@ plugins {
 
 android {
     val versionMajor = 1
-    val versionMinor = 27
-    val versionPatch = 1
+    val versionMinor = 28
+    val versionPatch = 0
     val appName = "KhoroojYar"
     val appVersionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
     val appVersionName = "$versionMajor.$versionMinor.$versionPatch"
@@ -135,4 +135,9 @@ dependencies {
 //    implementation(libs.vico.compose)
     implementation(libs.vico.compose.m3)
     implementation(libs.vico.views)
+
+    //Work Manager with Coroutines
+    implementation(libs.work)
+    implementation(libs.androidx.hilt.work)
+    kapt(libs.hilt.compiler)
 }

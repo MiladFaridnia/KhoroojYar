@@ -14,7 +14,8 @@ data class Settings(
 
     @Serializable(with = LocalTimeSerializer::class)
     val latestStart: LocalTime = LocalTime.of(9, 0),
-    val isDark: Boolean? = null
+    val isDark: Boolean? = null,
+    val areNotificationsEnabled: Boolean = false
 ) {
     val earliestEnd: LocalTime
         get() = earliestStart.plus(workDuration)

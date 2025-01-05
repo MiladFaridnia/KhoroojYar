@@ -31,7 +31,8 @@ class SettingsViewModel @Inject constructor(
                         earliestStart = timeSettings.earliestStart,
                         latestStart = timeSettings.latestStart,
                         workDuration = timeSettings.workDuration,
-                        isDark = timeSettings.isDark
+                        isDark = timeSettings.isDark,
+                        areNotificationsEnabled = timeSettings.areNotificationsEnabled
                     )
                 }
             }
@@ -83,6 +84,13 @@ class SettingsViewModel @Inject constructor(
                     dataStoreRepository.updateDarkMode(event.isDark)
                 }.invokeOnCompletion {
                     _state.update { it.copy(isDark = event.isDark) }
+                }
+            }
+            is SettingsEvent.NotificationsToggled -> {
+                viewModelScope.launch {
+                    dataStoreRepository.updateNotificationsEnabled(event.areEnabled)
+                }.invokeOnCompletion {
+                    _state.update { it.copy(areNotificationsEnabled = event.areEnabled) }
                 }
             }
         }
