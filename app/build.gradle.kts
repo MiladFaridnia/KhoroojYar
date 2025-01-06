@@ -10,7 +10,7 @@ plugins {
 
 android {
     val versionMajor = 1
-    val versionMinor = 28
+    val versionMinor = 29
     val versionPatch = 0
     val appName = "KhoroojYar"
     val appVersionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
@@ -140,4 +140,6 @@ dependencies {
     implementation(libs.work)
     implementation(libs.androidx.hilt.work)
     kapt(libs.hilt.compiler)
+
+    implementation (libs.compose.glide)
 }

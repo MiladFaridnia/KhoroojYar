@@ -1,5 +1,6 @@
 [versions]
 agp = "8.7.3"
+composeGlide = "1.0.0-beta01"
 composePersianDatePicker = "1.0.4"
 datastorePreferences = "1.1.1"
 hilt = "2.51.1"
@@ -36,6 +37,7 @@ androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+compose-glide = { module = "com.github.bumptech.glide:compose", version.ref = "composeGlide" }
 compose-persian-date-picker = { module = "com.github.razaghimahdi:Compose-Persian-Date-Picker", version.ref = "composePersianDatePicker" }
 dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltCompilerVersion" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }

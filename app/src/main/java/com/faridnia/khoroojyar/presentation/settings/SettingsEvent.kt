@@ -8,4 +8,5 @@ sealed class SettingsEvent {
     data object WorkDurationClicked : SettingsEvent()
     data class DarkModeClicked(val isDark: Boolean) : SettingsEvent()
     data class NotificationsToggled(val areEnabled: Boolean) : SettingsEvent()
+    data object ProfileClicked : SettingsEvent()
 }

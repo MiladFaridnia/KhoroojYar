@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.faridnia.khoroojyar.domain.repository.DataStoreRepository
 import com.faridnia.khoroojyar.util.toLocalTime
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,6 +22,10 @@ class SettingsViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(SettingState())
     val state = _state.asStateFlow()
+
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
 
     private var selectedSettingType: SettingType? = null
 
@@ -93,6 +99,12 @@ class SettingsViewModel @Inject constructor(
                     _state.update { it.copy(areNotificationsEnabled = event.areEnabled) }
                 }
             }
+
+            SettingsEvent.ProfileClicked -> {
+                viewModelScope.launch {
+                    _eventFlow.emit(UiEvent.NavigateToProfile)
+                }
+            }
         }
     }
 
@@ -128,5 +140,9 @@ class SettingsViewModel @Inject constructor(
 
             null -> {}
         }
+    }
+
+    sealed class UiEvent {
+        data object NavigateToProfile : UiEvent()
     }
 }
