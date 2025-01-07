@@ -3,6 +3,7 @@ package com.faridnia.khoroojyar.domain.use_case
 import com.faridnia.khoroojyar.data.room.WorkDayInfo
 import com.faridnia.khoroojyar.domain.repository.DataStoreRepository
 import com.faridnia.khoroojyar.presentation.exit_time_calculator.TimeSegment
+import com.faridnia.khoroojyar.util.safeLet
 import kotlinx.coroutines.flow.first
 import java.time.Duration
 import java.time.LocalTime
@@ -86,11 +87,13 @@ class CalculateTimeOffUseCase @Inject constructor(
             val missingDuration = requiredWorkDuration - workedDuration
             val missingEndTime = exitTime?.plus(missingDuration)
 
-            TimeSegment(
-                startTime = exitTime ?: LocalTime.of(0, 0),
-                endTime = missingEndTime ?: LocalTime.of(0, 0),
-                duration = missingDuration
-            )
+            safeLet(exitTime, missingEndTime) { exit, missingEnd ->
+                TimeSegment(
+                    startTime = exit,
+                    endTime = missingEnd,
+                    duration = missingDuration
+                )
+            }
         } else {
             null
         }

@@ -3,6 +3,8 @@ package com.faridnia.khoroojyar
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.media.AudioAttributes
+import android.net.Uri
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.faridnia.khoroojyar.presentation.notification.NotificationHelper
@@ -25,24 +27,21 @@ class MyApplication : Application(), Configuration.Provider {
         createNotificationChannel()
     }
 
-    /*    private fun createNotificationChannel() {
-            val channel = NotificationChannel(
-                ExitTimeNotificationService.EXIT_TIME_CHANNEL_ID,
-                "Exit Time",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            channel.description = "Used to warn you about exit time"
-
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }*/
-
     private fun createNotificationChannel() {
+        val sound = Uri.parse("android.resource://${packageName}/${R.raw.notif_sound}")
+        val audioAttributes = AudioAttributes
+            .Builder()
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+            .build()
         val channel = NotificationChannel(
             NotificationHelper.CHANNEL_ID,
             "Work Exit Reminders",
             NotificationManager.IMPORTANCE_HIGH
-        )
+        ).apply {
+            setSound(sound, audioAttributes)
+            vibrationPattern = longArrayOf(500, 500, 500, 500, 500)
+        }
         val manager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(channel)
     }
