@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import com.faridnia.khoroojyar.R
 import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 import java.time.LocalTime
-import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +52,7 @@ fun TimePickerDialog(
     )
 
     // State for Save Checkbox (if applicable)
-    var isSaveChecked by remember { mutableStateOf(false) }
+    var isSaveChecked by remember { mutableStateOf(true) }
 
     BasicAlertDialog(
         onDismissRequest = onDismiss,
@@ -92,7 +91,7 @@ fun TimePickerDialog(
                         Checkbox(
                             checked = isSaveChecked,
                             colors = CheckboxDefaults.colors(
-                                uncheckedColor = MaterialTheme.colorScheme.onBackground,
+                                uncheckedColor = MaterialTheme.colorScheme.primaryContainer
                             ),
                             onCheckedChange = { isChecked ->
                                 isSaveChecked = isChecked

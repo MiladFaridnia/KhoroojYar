@@ -20,7 +20,7 @@ import com.faridnia.khoroojyar.presentation.component.CustomText
 import com.faridnia.khoroojyar.presentation.theme.Void_Color
 
 @Composable
-fun InOutHorizontalComponent(icon: Int, title: String, detail: String, onClick: () -> Unit) {
+fun InOutHorizontalComponent(icon: Int, title: String, detail: String?, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -42,13 +42,13 @@ fun InOutHorizontalComponent(icon: Int, title: String, detail: String, onClick: 
                 text = title,
                 color = Void_Color
             )
-
-            Spacer(modifier = Modifier.height(2.dp))
-
-            CustomText(
-                text = detail,
-                color = MaterialTheme.colorScheme.tertiary,
-            )
+            detail?.let {
+                Spacer(modifier = Modifier.height(2.dp))
+                CustomText(
+                    text = detail,
+                    color = MaterialTheme.colorScheme.tertiary,
+                )
+            }
         }
     }
 }

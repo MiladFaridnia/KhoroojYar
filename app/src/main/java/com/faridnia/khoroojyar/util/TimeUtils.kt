@@ -10,12 +10,12 @@ fun Duration.toFormattedString(): String {
     return String.format(Locale.US, "%02d:%02d", hours, minutes)
 }
 
-fun LocalTime?.toFormattedString(): String {
-    val selectedHour = this?.hour ?: 0
-    val selectedMinute = this?.minute ?: 0
-    val selectedTime =
-        String.format(Locale.US, "%02d:%02d", selectedHour, selectedMinute)
-    return selectedTime
+fun LocalTime?.toFormattedString(): String? {
+    val selectedHour = this?.hour
+    val selectedMinute = this?.minute
+    return safeLet(selectedHour, selectedMinute) { hour, minute ->
+        String.format(Locale.US, "%02d:%02d", hour, minute)
+    }
 }
 
 fun String.toLocalTime(): LocalTime? {

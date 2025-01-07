@@ -21,12 +21,13 @@ import com.faridnia.khoroojyar.R
 import com.faridnia.khoroojyar.presentation.component.LightAndDarkPreview
 import com.faridnia.khoroojyar.presentation.component.Timer
 import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
+import com.faridnia.khoroojyar.util.bounceClick
 
 @Composable
 fun EmployeeCommute(
     modifier: Modifier = Modifier,
-    enterLabel: String,
-    exitLabel: String,
+    enterLabel: String?,
+    exitLabel: String?,
     enterOnClick: () -> Unit,
     exitOnClick: () -> Unit
 ) {
@@ -44,13 +45,11 @@ fun EmployeeCommute(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-          /*  CustomCircularProgressBar(
-                title = "Hours Worked",
-                progress = 68f,
-                size = 100.dp
-            )*/
-
-            Timer(modifier = Modifier.size(100.dp))
+            Timer(
+                modifier = Modifier
+                    .size(100.dp)
+                    .bounceClick()
+            )
 
             VerticalDivider(
                 modifier = Modifier
