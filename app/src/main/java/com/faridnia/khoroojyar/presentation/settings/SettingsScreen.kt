@@ -20,10 +20,12 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,14 +35,17 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.faridnia.khoroojyar.R
 import com.faridnia.khoroojyar.presentation.component.CustomText
 import com.faridnia.khoroojyar.presentation.component.LightAndDarkPreview
 import com.faridnia.khoroojyar.presentation.component.TimePickerDialog
 import com.faridnia.khoroojyar.presentation.component.bottom_navigation.BottomNavigationBar
+import com.faridnia.khoroojyar.presentation.settings.component.SimpleSettingsItem
 import com.faridnia.khoroojyar.presentation.settings.component.SwitchDarkMode
 import com.faridnia.khoroojyar.presentation.settings.component.SwitchNotification
 import com.faridnia.khoroojyar.presentation.settings.component.TimeSettingsItem
 import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
+import com.faridnia.khoroojyar.presentation.util.Screen
 import com.faridnia.khoroojyar.util.toFormattedString
 import com.jrg.app.ui.component.snackbar.CustomScaffold
 
@@ -51,6 +56,15 @@ fun SettingsScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    LaunchedEffect(true) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                SettingsViewModel.UiEvent.NavigateToProfile -> {
+                    navController.navigate(Screen.Profile.route)
+                }
+            }
+        }
+    }
     CustomScaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ) {
@@ -111,6 +125,16 @@ fun SettingsContent(state: SettingState, onEvent: (SettingsEvent) -> Unit) {
                     containerColor = colorScheme.primaryContainer
                 )
             ) {
+                SimpleSettingsItem(
+                    title = "Profile",
+                    iconId = R.drawable.ic_profile_tick,
+                    onClick = { onEvent(SettingsEvent.ProfileClicked) })
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    thickness = 1.dp, color = colorScheme.onSurface
+                )
+
                 SwitchDarkMode(
                     isChecked = state.isDark ?: isSystemInDarkTheme(),
                     onCheckedChange = { onEvent(SettingsEvent.DarkModeClicked(it)) }

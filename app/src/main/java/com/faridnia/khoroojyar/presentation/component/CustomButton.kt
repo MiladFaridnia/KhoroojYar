@@ -17,11 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.faridnia.khoroojyar.R
 import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 
@@ -36,11 +32,7 @@ fun CustomButton(
     @DrawableRes iconId: Int? = null,
     iconColor: Color? = null,
     isSpacerNeeded: Boolean = true,
-    textStyle: TextStyle = TextStyle(
-        fontSize = 14.sp,
-        fontFamily = FontFamily(Font(R.font.iran_sans_mobile_fa_num)),
-        fontWeight = FontWeight.Bold
-    )
+    textStyle: TextStyle = MaterialTheme.typography.titleSmall
 ) {
     Button(
         onClick = onClick,

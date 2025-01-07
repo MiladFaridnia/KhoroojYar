@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.faridnia.khoroojyar.presentation.analitics.WorkDayChartScreen
 import com.faridnia.khoroojyar.presentation.exit_time_calculator.ExitTimeCalculatorScreen
+import com.faridnia.khoroojyar.presentation.profile.ProfileScreen
 import com.faridnia.khoroojyar.presentation.settings.SettingsScreen
 import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 import com.faridnia.khoroojyar.presentation.util.Screen
@@ -39,6 +40,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(Screen.Analytics.route) {
                             WorkDayChartScreen(navController)
+                        }
+                        composable(Screen.Profile.route) {
+                            ProfileScreen(navController)
                         }
                     }
             }
