@@ -9,6 +9,4 @@ data class ExitTimeState(
     val timeWorked: TimeSegment? = null,
     val overtime: TimeSegment? = null,
     val canExitTime: LocalTime? = null
-) {
-    fun isExitTimeEntered() = exitTime?.isAfter(LocalTime.MIN) ?: false
-}
+)

@@ -250,6 +250,7 @@ fun ExitTimeCalcContent(
 
     if (showEnterTimePickerDialog) {
         TimePickerDialog(
+            time = state.enterTime,
             onConfirm = { timePickerState ->
                 onTimeConfirm(
                     timePickerState,
@@ -272,13 +273,14 @@ fun ExitTimeCalcContent(
 
     if (showExitTimePickerDialog) {
         TimePickerDialog(
+            time = state.exitTime,
             onConfirm = { timePickerState ->
                 onTimeConfirm(
                     timePickerState,
                     { onEvent(ExitTimeCalculatorEvent.OnExitTimeChange(it)) }
-                ) { showEnterTimePickerDialog = it }
+                ) { showExitTimePickerDialog = it }
             },
-            onDismiss = { showEnterTimePickerDialog = false },
+            onDismiss = { showExitTimePickerDialog = false },
             showSaveOption = true,
             onSaveChecked = { isChecked, timePickerState ->
                 onEvent(

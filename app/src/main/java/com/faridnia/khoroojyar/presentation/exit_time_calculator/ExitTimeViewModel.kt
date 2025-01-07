@@ -6,9 +6,9 @@ import com.faridnia.khoroojyar.data.room.WorkDayInfo
 import com.faridnia.khoroojyar.domain.use_case.CalculateExitTimeUseCase
 import com.faridnia.khoroojyar.domain.use_case.CalculateOvertimeUseCase
 import com.faridnia.khoroojyar.domain.use_case.CalculateTimeOffUseCase
-import com.faridnia.khoroojyar.domain.use_case.notification.ScheduleNotificationUseCase
 import com.faridnia.khoroojyar.domain.use_case.db.GetWorkDayInfoByDayUseCase
 import com.faridnia.khoroojyar.domain.use_case.db.UpsertWorkDayInfoUseCase
+import com.faridnia.khoroojyar.domain.use_case.notification.ScheduleNotificationUseCase
 import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarController
 import com.faridnia.khoroojyar.presentation.component.snackbar.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -86,9 +86,6 @@ class ExitTimeViewModel @Inject constructor(
             _state.update { currentState ->
                 currentState.copy(enterTime = newEnterTime)
             }
-            viewModelScope.launch {
-                scheduleNotificationUseCase(newEnterTime)
-            }
             calculateTime()
         } catch (e: Exception) {
             handleInvalidTimeFormat()
@@ -118,7 +115,7 @@ class ExitTimeViewModel @Inject constructor(
                     firstExitTime = exitTime
                 )
             )
-            if (state.value.isExitTimeEntered()) {
+            if (state.value.exitTime != null) {
                 val timeWorked = getTotalTimeWorkInSegment(
                     enterTime = enterTime,
                     exitTime = exitTime!!
@@ -140,6 +137,7 @@ class ExitTimeViewModel @Inject constructor(
                 }
             } else {
                 val calculatedExitTime = calculateExitTimeUseCase(enterTime)
+                scheduleNotificationUseCase(enterTime)
                 _state.update {
                     it.copy(
                         timeOffList = timeOffs,
