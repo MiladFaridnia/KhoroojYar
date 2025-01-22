@@ -15,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.faridnia.khoroojyar.presentation.component.CustomText
+import com.faridnia.khoroojyar.presentation.component.LightAndDarkPreview
+import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 
 @Composable
 fun SwitchSetting(
@@ -30,10 +32,10 @@ fun SwitchSetting(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(2.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(containerColor)
-            .padding(16.dp)
+            .padding(horizontal = 16.dp)
     ) {
         CustomText(
             text = title,
@@ -51,5 +53,13 @@ fun SwitchSetting(
                 uncheckedTrackColor = colorScheme.surfaceVariant
             )
         )
+    }
+}
+
+@LightAndDarkPreview
+@Composable
+private fun PreviewSwitchSetting() {
+    KhoroojYarTheme {
+        SwitchSetting(title = "Notifications", isChecked = true, onCheckedChange = {})
     }
 }

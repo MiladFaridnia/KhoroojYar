@@ -28,5 +28,6 @@
     <string name="run_the_office_doors_are_about_to_lock_in_15_minutes">Run! The office doors are about to lock in 15 minutes! 🏃‍♂️💨</string>
     <string name="run_the_office_doors_are_about_to_lock_at_exit_time">Uh-oh! The doors are locking NOW! Time to escape! 🚪💨</string>
     <string name="notifications">Notifications</string>
+    <string name="profile">Profile</string>
 
 </resources>

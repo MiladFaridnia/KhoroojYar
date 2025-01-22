@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -92,30 +91,9 @@ fun SettingsContent(state: SettingState, onEvent: (SettingsEvent) -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
-                .padding()
         ) {
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-                    .padding(vertical = 30.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = null,
-                    tint = colorScheme.onPrimary,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .size(45.dp),
-                )
-                Spacer(Modifier.width(8.dp))
-                CustomText(
-                    text = "Settings",
-                    style = MaterialTheme.typography.displaySmall,
-                    color = colorScheme.onPrimary
-                )
-            }
+            HeaderSection()
+
             ElevatedCard(
                 modifier = Modifier.fillMaxHeight(),
                 shape = RoundedCornerShape(
@@ -126,12 +104,13 @@ fun SettingsContent(state: SettingState, onEvent: (SettingsEvent) -> Unit) {
                 )
             ) {
                 SimpleSettingsItem(
-                    title = "Profile",
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    title = stringResource(R.string.profile),
                     iconId = R.drawable.ic_profile_tick,
                     onClick = { onEvent(SettingsEvent.ProfileClicked) })
 
                 HorizontalDivider(
-                    modifier = Modifier.padding(horizontal = 16.dp),
+                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp),
                     thickness = 1.dp, color = colorScheme.onSurface
                 )
 
@@ -139,20 +118,24 @@ fun SettingsContent(state: SettingState, onEvent: (SettingsEvent) -> Unit) {
                     isChecked = state.isDark ?: isSystemInDarkTheme(),
                     onCheckedChange = { onEvent(SettingsEvent.DarkModeClicked(it)) }
                 )
+
                 SwitchNotification(
                     isChecked = state.areNotificationsEnabled,
                     onCheckedChange = { onEvent(SettingsEvent.NotificationsToggled(it)) }
                 )
+
                 TimeSettingsItem(
                     title = stringResource(id = com.faridnia.khoroojyar.R.string.earliest_start),
                     time = state.earliestStart?.toFormattedString(),
                     onClick = { onEvent(SettingsEvent.EarliestStartClicked) }
                 )
+
                 TimeSettingsItem(
                     title = stringResource(id = com.faridnia.khoroojyar.R.string.latest_start),
                     time = state.latestStart?.toFormattedString(),
                     onClick = { onEvent(SettingsEvent.LatestStartClicked) }
                 )
+
                 TimeSettingsItem(
                     title = stringResource(id = com.faridnia.khoroojyar.R.string.work_duration),
                     time = state.workDuration?.toFormattedString(),
@@ -173,6 +156,32 @@ fun SettingsContent(state: SettingState, onEvent: (SettingsEvent) -> Unit) {
                 }
             )
         }
+    }
+}
+
+@Composable
+private fun HeaderSection() {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .padding(vertical = 20.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_setting),
+            contentDescription = null,
+            tint = colorScheme.onPrimary,
+            modifier = Modifier
+                .fillMaxHeight()
+                .size(45.dp),
+        )
+        Spacer(Modifier.width(8.dp))
+        CustomText(
+            text = stringResource(R.string.settings),
+            style = MaterialTheme.typography.displaySmall,
+            color = colorScheme.onPrimary
+        )
     }
 }
 
