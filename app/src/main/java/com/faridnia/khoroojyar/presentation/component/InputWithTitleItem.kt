@@ -16,9 +16,11 @@ fun InputWithTitleItem(title: String, keyboardType: KeyboardType = KeyboardType.
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
     ) {
-        CustomText(text = title)
+        CustomText(modifier = Modifier.padding(0.dp), text = title)
         CustomTextInput(
-            value = "", onValueChange = {},
+            modifier = Modifier.padding(0.dp),
+            value = "",
+            onValueChange = {},
             keyboardType = keyboardType
         )
     }

@@ -36,10 +36,10 @@ fun SimpleSettingsItem(
     modifier = modifier
     .clickable(onClick = onClick)
     .fillMaxWidth()
-    .padding(8.dp)
+    .padding(2.dp)
     .clip(RoundedCornerShape(12.dp))
     .background(containerColor)
-    .padding(16.dp)
+    .padding(horizontal = 16.dp)
     ) {
         CustomText(
             text = title,

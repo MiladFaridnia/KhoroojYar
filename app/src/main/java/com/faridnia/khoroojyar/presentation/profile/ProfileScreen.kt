@@ -218,7 +218,6 @@ private fun HeaderSection() {
             contentAlignment = Alignment.Center
         ) {
             Icon(
-
                 painter = painterResource(R.drawable.ic_profile_tick),
                 contentDescription = "Notification Icon",
                 tint = colorScheme.surfaceVariant,

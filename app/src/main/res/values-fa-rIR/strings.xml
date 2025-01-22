@@ -24,4 +24,9 @@
     <string name="home">خانه</string>
     <string name="analytics">تحلیل</string>
     <string name="settings">تنظیمات</string>
+    <string name="escape_alert">🚨 هشدار خروج!</string>
+    <string name="run_the_office_doors_are_about_to_lock_in_15_minutes">فرار کن! درها تا 15 دقیقه دیگه بسته میشن! 🏃‍♂️💨</string>
+    <string name="run_the_office_doors_are_about_to_lock_at_exit_time">اوه اوه! در ها دارن بسته میشن 🚪💨</string>
+    <string name="notifications">اعلان ها</string>
+    <string name="profile">پروفایل</string>
 </resources>

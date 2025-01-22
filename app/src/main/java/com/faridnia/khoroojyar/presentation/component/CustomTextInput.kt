@@ -3,7 +3,9 @@ package com.faridnia.khoroojyar.presentation.component
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
@@ -33,12 +35,22 @@ import com.faridnia.khoroojyar.presentation.theme.KhoroojYarTheme
 @Composable
 fun PreviewMyTextInput() {
     KhoroojYarTheme {
-        CustomTextInput(
-            onTextChanged = {},
-            hasError = true,
-            labelText = "text",
-            supportingText = "error message"
-        )
+        Column {
+            CustomTextInput(
+                onTextChanged = {},
+                hasError = true,
+                labelText = "text 1",
+                supportingText = "error message",
+                iconRes = R.drawable.ic_setting,
+            )
+
+            CustomTextInput(
+                onTextChanged = {},
+                labelText = "text 2",
+                supportingText = "supportingText",
+                iconRes = R.drawable.ic_setting,
+            )
+        }
     }
 }
 
@@ -151,7 +163,9 @@ fun CustomTextInput(
 
     val iconsColor = MaterialTheme.colorScheme.surfaceTint
     OutlinedTextField(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(0.dp),
         value = textInput.value,
         onValueChange = { newText ->
             if (newText.length <= maxChar) {
